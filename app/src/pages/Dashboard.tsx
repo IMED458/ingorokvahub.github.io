@@ -150,7 +150,7 @@ export function Dashboard({ news }: DashboardProps) {
               <div className="h-8 w-1.5 bg-gradient-to-b from-indigo-500 to-purple-600 rounded-full shadow-[0_0_15px_rgba(99,102,241,0.2)]" />
               <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-slate-400">ნავიგაცია</h3>
             </div>
-            <div className="grid grid-cols-2 lg:grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
               {quickActions.map((action) => (
                 <Link 
                   key={action.title}
@@ -160,7 +160,7 @@ export function Dashboard({ news }: DashboardProps) {
                   <div className={`p-3 rounded-2xl ${action.bg} ${action.color} group-hover:scale-110 transition-transform duration-500`}>
                     <action.icon className="w-6 h-6" />
                   </div>
-                  <span className="text-xs font-bold text-slate-600 group-hover:text-slate-900 transition-colors">{action.title}</span>
+                  <span className="text-xs font-bold text-slate-600 group-hover:text-slate-900 transition-colors break-anywhere">{action.title}</span>
                 </Link>
               ))}
             </div>

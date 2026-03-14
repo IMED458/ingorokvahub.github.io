@@ -66,7 +66,7 @@ export function KnowledgeHub() {
           <h2 className="text-4xl font-extrabold text-gradient tracking-tight">ცოდნის ჰაბი</h2>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full md:w-auto">
           <div className="relative group w-full sm:w-auto">
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
             <input
@@ -82,7 +82,7 @@ export function KnowledgeHub() {
             href={KNOWLEDGE_HUB_URL}
             target="_blank"
             rel="noreferrer"
-            className="flex items-center gap-3 px-8 py-5 bg-blue-600 text-white rounded-[2rem] hover:bg-blue-700 transition-all font-bold text-xs uppercase tracking-widest shadow-lg shadow-blue-500/20"
+            className="w-full sm:w-auto justify-center flex items-center gap-3 px-8 py-5 bg-blue-600 text-white rounded-[2rem] hover:bg-blue-700 transition-all font-bold text-xs uppercase tracking-widest shadow-lg shadow-blue-500/20"
           >
             Drive საქაღალდე
             <ExternalLink className="w-4 h-4" />
@@ -90,17 +90,17 @@ export function KnowledgeHub() {
         </div>
       </div>
 
-      <div className="glass-card rounded-[2.5rem] p-6 sm:p-8 flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-8">
+      <div className="glass-card rounded-[2.5rem] p-6 sm:p-8 flex flex-col xl:flex-row xl:items-center gap-6 xl:gap-8">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600">
             <Folder className="w-7 h-7" />
           </div>
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-400">სინქი</p>
-            <h3 className="text-lg font-bold text-slate-900">Google Drive-დან გენერირებული ბიბლიოთეკა</h3>
+            <h3 className="text-lg font-bold text-slate-900 break-anywhere">Google Drive-დან გენერირებული ბიბლიოთეკა</h3>
           </div>
         </div>
-        <div className="flex-1 grid sm:grid-cols-3 gap-4">
+        <div className="flex-1 grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
           <div className="rounded-2xl bg-slate-50 px-4 py-3">
             <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">დეპარტამენტები</p>
             <p className="mt-1 text-xl font-black text-slate-900">{knowledgeDepartmentsMeta.departmentCount}</p>
@@ -136,16 +136,21 @@ export function KnowledgeHub() {
       <div className="space-y-16">
         {filteredDepartments.map((department) => (
           <section key={department.id} className="space-y-8">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-4">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex items-start gap-4 min-w-0">
                 <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600">
                   <Folder className="w-6 h-6" />
                 </div>
-                <div>
-                  <h3 className="text-2xl font-bold text-slate-900">{department.title}</h3>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
-                    {department.documentCount} დოკუმენტი • განახლდა {department.modifiedLabel}
-                  </p>
+                <div className="min-w-0">
+                  <h3 className="text-2xl font-bold text-slate-900 break-anywhere">{department.title}</h3>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <span className="rounded-full bg-slate-100 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">
+                      {department.documentCount} დოკუმენტი
+                    </span>
+                    <span className="rounded-full bg-blue-50 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-blue-600">
+                      განახლდა {department.modifiedLabel}
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -153,13 +158,13 @@ export function KnowledgeHub() {
                 href={department.url}
                 target="_blank"
                 rel="noreferrer"
-                className="w-fit flex items-center gap-2 px-5 py-3 rounded-2xl glass-card text-[10px] font-bold uppercase tracking-widest text-slate-600 hover:text-blue-600 transition-all"
+                className="w-full sm:w-fit justify-center flex items-center gap-2 px-5 py-3 rounded-2xl glass-card text-[10px] font-bold uppercase tracking-widest text-slate-600 hover:text-blue-600 transition-all"
               >
                 საქაღალდის გახსნა <ExternalLink className="w-3.5 h-3.5" />
               </a>
             </div>
 
-            <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
+            <div className="grid lg:grid-cols-2 gap-5 xl:gap-6">
               {department.documents.map((document, index) => {
                 const Icon = getFileIcon(document.extension);
 
@@ -172,34 +177,36 @@ export function KnowledgeHub() {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: index * 0.03 }}
-                    className="glass-card rounded-[2.5rem] overflow-hidden glass-card-hover group"
+                    className="glass-card rounded-[2.25rem] p-6 sm:p-7 glass-card-hover group"
                   >
-                    <div className="p-8">
-                      <div className="flex items-start justify-between mb-6">
-                        <div className="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all duration-500">
-                          <Icon className="w-7 h-7 text-slate-400 group-hover:text-white" />
-                        </div>
-                        <ExternalLink className="w-5 h-5 text-slate-300 group-hover:text-blue-600 transition-colors" />
+                    <div className="flex items-start gap-4 sm:gap-5 min-w-0">
+                      <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-slate-50 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all duration-500 shrink-0">
+                        <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-slate-400 group-hover:text-white" />
                       </div>
 
-                      <h4 className="text-lg font-bold text-slate-900 mb-3 leading-tight group-hover:text-blue-600 transition-colors min-h-[3.5rem]">
-                        {document.title}
-                      </h4>
+                      <div className="min-w-0 flex-1 space-y-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <h4 className="text-base sm:text-lg font-bold text-slate-900 leading-relaxed break-anywhere group-hover:text-blue-600 transition-colors">
+                            {document.title}
+                          </h4>
+                          <ExternalLink className="w-5 h-5 text-slate-300 group-hover:text-blue-600 transition-colors shrink-0 mt-1" />
+                        </div>
 
-                      {document.pathLabel && (
-                        <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-indigo-500">
-                          {document.pathLabel}
-                        </p>
-                      )}
+                        {document.pathLabel && (
+                          <p className="text-[11px] font-semibold leading-relaxed text-indigo-600 break-anywhere">
+                            {document.pathLabel}
+                          </p>
+                        )}
 
-                      <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
-                        <span className="flex items-center gap-2">
-                          <Clock className="w-3.5 h-3.5" />
-                          {document.modifiedLabel}
-                        </span>
-                        <span className="rounded-full bg-slate-50 px-3 py-1 text-slate-500 border border-slate-100">
-                          {document.extension || 'file'}
-                        </span>
+                        <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+                          <span className="inline-flex items-center gap-2 rounded-full bg-slate-50 px-3 py-1.5 text-slate-500 border border-slate-100">
+                            <Clock className="w-3.5 h-3.5" />
+                            {document.modifiedLabel}
+                          </span>
+                          <span className="rounded-full bg-blue-50 px-3 py-1.5 text-blue-600 border border-blue-100">
+                            {document.extension || 'file'}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </motion.a>

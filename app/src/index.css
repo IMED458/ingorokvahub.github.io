@@ -44,3 +44,8 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+.break-anywhere {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
