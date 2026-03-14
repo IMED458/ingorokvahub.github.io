@@ -35,6 +35,21 @@ const quickActions = [
   { title: 'სიახლეები', icon: Newspaper, to: '/news', color: 'text-sky-600', bg: 'bg-sky-50' },
 ];
 
+const corporateNumbers = [
+  { department: 'ნეიროქირურგია', phone: '511-45-35-71' },
+  { department: 'ნევროლოგია', phone: '511-45-35-72' },
+  { department: 'თორაკოქირურგია', phone: '511-12-00-83' },
+  { department: 'ტრავმატოლოგია', phone: '511-45-04-72' },
+  { department: 'ზოგადი რეანიმაცია', phone: '511-45-04-86' },
+  { department: 'ინფექციური', phone: '595-62-47-27' },
+  { department: 'შინაგანი/თერაპია', phone: '599-90-42-49' },
+  { department: 'კარდიორეანიმაცია', phone: '599-49-04-41' },
+  { department: 'კარდიოლოგია', phone: '598-16-51-63' },
+  { department: 'ჰემატოლოგია', phone: '577-68-13-20' },
+  { department: 'ნეირორეანიმაცია', phone: '511-45-35-76' },
+  { department: 'ლაბორატორია', phone: '555-92-22-29' },
+];
+
 const iconMap: Record<string, any> = {
   Phone,
   Calculator,
@@ -52,6 +67,10 @@ const iconMap: Record<string, any> = {
 interface DashboardProps {
   news: NewsItem[];
   onOpenNews: (item: NewsItem) => void;
+}
+
+function sanitizePhone(phone: string) {
+  return phone.replace(/\D/g, '');
 }
 
 export function Dashboard({ news, onOpenNews }: DashboardProps) {
@@ -172,28 +191,30 @@ export function Dashboard({ news, onOpenNews }: DashboardProps) {
             </div>
           </section>
 
-          {/* Hotline */}
+          {/* Corporate Numbers */}
           <section className="glass-card p-6 sm:p-10 rounded-[3rem] relative overflow-hidden border-blue-100">
             <div className="relative z-10">
               <h3 className="text-sm font-bold uppercase tracking-[0.3em] text-blue-600 mb-6 sm:mb-8 flex items-center gap-3">
                 <Phone className="w-5 h-5" />
-                ცხელი ხაზი
+                კორპორატიული ნომრები
               </h3>
-              <div className="space-y-4 sm:space-y-6">
-                <div className="flex justify-between items-center group">
-                  <span className="text-xs text-slate-400 font-semibold group-hover:text-slate-600 transition-colors">მიღება</span>
-                  <span className="font-mono text-lg sm:text-xl font-black text-slate-900">100</span>
-                </div>
-                <div className="h-[1px] bg-slate-100" />
-                <div className="flex justify-between items-center group">
-                  <span className="text-xs text-slate-400 font-semibold group-hover:text-slate-600 transition-colors">რეანიმაცია</span>
-                  <span className="font-mono text-lg sm:text-xl font-black text-slate-900">205</span>
-                </div>
-                <div className="h-[1px] bg-slate-100" />
-                <div className="flex justify-between items-center group">
-                  <span className="text-xs text-slate-400 font-semibold group-hover:text-slate-600 transition-colors">IT მხარდაჭერა</span>
-                  <span className="font-mono text-lg sm:text-xl font-black text-slate-900">911</span>
-                </div>
+              <div className="rounded-[2rem] bg-white/60 border border-white/70 overflow-hidden">
+                {corporateNumbers.map((item, index) => (
+                  <div key={item.department}>
+                    <div className="flex items-center justify-between gap-4 px-4 sm:px-5 py-4 sm:py-4.5 group">
+                      <span className="text-sm text-slate-500 font-semibold leading-snug group-hover:text-slate-700 transition-colors break-anywhere">
+                        {item.department}
+                      </span>
+                      <a
+                        href={`tel:${sanitizePhone(item.phone)}`}
+                        className="font-mono text-base sm:text-lg font-black text-slate-900 hover:text-blue-600 transition-colors whitespace-nowrap shrink-0"
+                      >
+                        {item.phone}
+                      </a>
+                    </div>
+                    {index < corporateNumbers.length - 1 && <div className="h-px bg-slate-100" />}
+                  </div>
+                ))}
               </div>
             </div>
             <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-blue-500 rounded-full blur-[100px] opacity-10 animate-pulse" />
