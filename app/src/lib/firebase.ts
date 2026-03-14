@@ -17,7 +17,7 @@ export const firebaseApp = initializeApp(firebaseConfig);
 export const firestore = getFirestore(firebaseApp);
 export const firebaseAuth = getAuth(firebaseApp);
 export const firebaseAdminEmail =
-  import.meta.env.VITE_FIREBASE_ADMIN_EMAIL?.trim() || 'admin@ingorokvahub.local';
+  import.meta.env.VITE_FIREBASE_ADMIN_EMAIL?.trim() || 'eringorokva@gmail.com';
 
 let analyticsPromise: Promise<Analytics | null> | null = null;
 
