@@ -168,29 +168,7 @@ export function Dashboard({ news, onOpenNews }: DashboardProps) {
           </section>
         </div>
 
-        <div className="lg:col-span-4 space-y-12">
-          {/* Quick Actions */}
-          <section>
-            <div className="flex items-center gap-4 mb-8">
-              <div className="h-8 w-1.5 bg-gradient-to-b from-indigo-500 to-purple-600 rounded-full shadow-[0_0_15px_rgba(99,102,241,0.2)]" />
-              <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-slate-400">ნავიგაცია</h3>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
-              {quickActions.map((action) => (
-                <Link 
-                  key={action.title}
-                  to={action.to}
-                  className="flex items-center gap-5 p-5 glass-card rounded-3xl glass-card-hover group"
-                >
-                  <div className={`p-3 rounded-2xl ${action.bg} ${action.color} group-hover:scale-110 transition-transform duration-500`}>
-                    <action.icon className="w-6 h-6" />
-                  </div>
-                  <span className="text-xs font-bold text-slate-600 group-hover:text-slate-900 transition-colors break-anywhere">{action.title}</span>
-                </Link>
-              ))}
-            </div>
-          </section>
-
+        <div className="lg:col-span-4">
           {/* Corporate Numbers */}
           <section className="glass-card p-6 sm:p-10 rounded-[3rem] relative overflow-hidden border-blue-100">
             <div className="relative z-10">
@@ -201,13 +179,13 @@ export function Dashboard({ news, onOpenNews }: DashboardProps) {
               <div className="space-y-4 sm:space-y-6">
                 {corporateNumbers.map((item, index) => (
                   <div key={item.department}>
-                    <div className="flex justify-between items-center group gap-4">
-                      <span className="text-xs text-slate-400 font-semibold group-hover:text-slate-600 transition-colors">
+                    <div className="grid grid-cols-[minmax(0,1fr)_9.5rem] sm:grid-cols-[minmax(0,1fr)_11rem] items-center gap-x-6 group">
+                      <span className="text-[11px] sm:text-xs text-slate-400 font-semibold group-hover:text-slate-600 transition-colors whitespace-nowrap">
                         {item.department}
                       </span>
                       <a
                         href={`tel:${sanitizePhone(item.phone)}`}
-                        className="font-mono text-lg sm:text-xl font-black text-slate-900 whitespace-nowrap shrink-0"
+                        className="font-mono text-lg sm:text-xl font-black text-slate-900 whitespace-nowrap text-right tabular-nums"
                       >
                         {item.phone}
                       </a>
