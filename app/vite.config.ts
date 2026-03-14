@@ -4,11 +4,16 @@ import path from 'path';
 import {defineConfig} from 'vite';
 
 export default defineConfig({
+  base: './',
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, '.'),
     },
+  },
+  build: {
+    outDir: '../.pages-dist',
+    emptyOutDir: true,
   },
   server: {
     hmr: process.env.DISABLE_HMR !== 'true',

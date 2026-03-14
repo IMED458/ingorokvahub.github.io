@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import { Sidebar } from './components/Sidebar';
 import { Dashboard } from './pages/Dashboard';
 import { KnowledgeHub } from './pages/KnowledgeHub';
@@ -17,7 +17,7 @@ const Placeholder = ({ title }: { title: string }) => (
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <div className="min-h-screen flex bg-slate-50 font-sans text-slate-900 selection:bg-blue-100 selection:text-blue-900">
         <Sidebar />
         <main className="flex-1 ml-72 min-h-screen relative">
@@ -55,6 +55,6 @@ export default function App() {
           </div>
         </main>
       </div>
-    </BrowserRouter>
+    </HashRouter>
   );
 }

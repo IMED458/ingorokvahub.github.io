@@ -1,14 +1,12 @@
 # Ingorokva Clinic Medical Hub
 
-Internal web interface for Ingorokva Clinic staff.
+This repository serves the production-ready static site from the repository root for GitHub Pages.
 
-## Run locally
+Editable Vite source lives in [`app/`](app/).
 
-Prerequisite: Node.js
+## Local development
 
-1. Install dependencies:
-   `npm install`
-2. Start the development server:
-   `npm run dev`
-3. Build for production:
-   `npm run build`
+1. `cd app`
+2. `npm install`
+3. `npm run dev`
+4. `npm run build`
