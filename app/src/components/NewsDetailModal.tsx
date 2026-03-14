@@ -1,11 +1,14 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { CalendarDays, X } from 'lucide-react';
+import { CalendarDays, Pencil, Trash2, X } from 'lucide-react';
 import type { NewsItem } from '../types';
 
 interface NewsDetailModalProps {
   item: NewsItem | null;
   onClose: () => void;
+  canManage?: boolean;
+  onEdit?: (item: NewsItem) => void;
+  onDelete?: (item: NewsItem) => void;
 }
 
 function getParagraphs(item: NewsItem) {
@@ -20,7 +23,13 @@ function getParagraphs(item: NewsItem) {
     .filter(Boolean);
 }
 
-export function NewsDetailModal({ item, onClose }: NewsDetailModalProps) {
+export function NewsDetailModal({
+  item,
+  onClose,
+  canManage = false,
+  onEdit,
+  onDelete,
+}: NewsDetailModalProps) {
   React.useEffect(() => {
     if (!item) {
       return;
@@ -70,14 +79,38 @@ export function NewsDetailModal({ item, onClose }: NewsDetailModalProps) {
             </h3>
           </div>
 
-          <button
-            type="button"
-            onClick={onClose}
-            className="shrink-0 p-3 rounded-2xl bg-slate-50 text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-colors"
-            aria-label="Close news"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            {canManage && onEdit && (
+              <button
+                type="button"
+                onClick={() => onEdit(item)}
+                className="inline-flex items-center gap-2 rounded-2xl bg-slate-100 px-4 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+              >
+                <Pencil className="w-4 h-4" />
+                რედაქტირება
+              </button>
+            )}
+
+            {canManage && onDelete && (
+              <button
+                type="button"
+                onClick={() => onDelete(item)}
+                className="inline-flex items-center gap-2 rounded-2xl bg-rose-50 px-4 py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-rose-600 hover:bg-rose-100 transition-colors"
+              >
+                <Trash2 className="w-4 h-4" />
+                წაშლა
+              </button>
+            )}
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="shrink-0 p-3 rounded-2xl bg-slate-50 text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+              aria-label="Close news"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         <div className="px-6 sm:px-8 py-6 sm:py-8 overflow-y-auto max-h-[calc(88vh-7.5rem)]">

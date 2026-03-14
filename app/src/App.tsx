@@ -15,34 +15,43 @@ import { LoginPage } from './pages/LoginPage';
 import { Resources } from './pages/Resources';
 import type { NewsItem } from './types';
 
-const CUSTOM_NEWS_STORAGE_KEY = 'medhub_news';
+const NEWS_STORAGE_KEY = 'medhub_news_state_v2';
+const LEGACY_CUSTOM_NEWS_STORAGE_KEY = 'medhub_news';
 
-function getSavedCustomNews(): NewsItem[] {
+function isNewsItem(value: unknown): value is NewsItem {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  const item = value as Record<string, unknown>;
+  return (
+    typeof item.id === 'string' &&
+    typeof item.title === 'string' &&
+    typeof item.date === 'string' &&
+    typeof item.category === 'string' &&
+    typeof item.summary === 'string'
+  );
+}
+
+function readStoredNews(storageKey: string): NewsItem[] | null {
   if (typeof window === 'undefined') {
-    return [];
+    return null;
   }
 
   try {
-    const saved = window.localStorage.getItem(CUSTOM_NEWS_STORAGE_KEY);
+    const saved = window.localStorage.getItem(storageKey);
     if (!saved) {
-      return [];
+      return null;
     }
 
     const parsed = JSON.parse(saved);
     if (!Array.isArray(parsed)) {
-      return [];
+      return null;
     }
 
-    return parsed.filter(
-      (item): item is NewsItem =>
-        typeof item?.id === 'string' &&
-        typeof item?.title === 'string' &&
-        typeof item?.date === 'string' &&
-        typeof item?.category === 'string' &&
-        typeof item?.summary === 'string',
-    );
+    return parsed.filter(isNewsItem);
   } catch {
-    return [];
+    return null;
   }
 }
 
@@ -59,16 +68,28 @@ function sortNews(items: NewsItem[]) {
   return [...items].sort((left, right) => getNewsTimestamp(right) - getNewsTimestamp(left));
 }
 
+function getInitialNewsState() {
+  const storedNews = readStoredNews(NEWS_STORAGE_KEY);
+  if (storedNews !== null) {
+    return sortNews(storedNews);
+  }
+
+  const legacyCustomNews = readStoredNews(LEGACY_CUSTOM_NEWS_STORAGE_KEY) ?? [];
+  return sortNews([...NEWS, ...legacyCustomNews]);
+}
+
 export default function App() {
   const { isAuthenticated, role } = useAuth();
   const [now, setNow] = React.useState(() => new Date());
-  const [isAddNewsOpen, setIsAddNewsOpen] = React.useState(false);
-  const [customNews, setCustomNews] = React.useState<NewsItem[]>(getSavedCustomNews);
+  const [isNewsModalOpen, setIsNewsModalOpen] = React.useState(false);
+  const [editingNews, setEditingNews] = React.useState<NewsItem | null>(null);
+  const [news, setNews] = React.useState<NewsItem[]>(getInitialNewsState);
   const [selectedNews, setSelectedNews] = React.useState<NewsItem | null>(null);
 
   React.useEffect(() => {
-    window.localStorage.setItem(CUSTOM_NEWS_STORAGE_KEY, JSON.stringify(customNews));
-  }, [customNews]);
+    window.localStorage.setItem(NEWS_STORAGE_KEY, JSON.stringify(news));
+    window.localStorage.removeItem(LEGACY_CUSTOM_NEWS_STORAGE_KEY);
+  }, [news]);
 
   React.useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 1000);
@@ -77,7 +98,8 @@ export default function App() {
 
   React.useEffect(() => {
     if (role !== 'admin') {
-      setIsAddNewsOpen(false);
+      setIsNewsModalOpen(false);
+      setEditingNews(null);
     }
   }, [role]);
 
@@ -87,10 +109,57 @@ export default function App() {
     }
   }, [isAuthenticated]);
 
-  const news = React.useMemo(() => sortNews([...NEWS, ...customNews]), [customNews]);
+  React.useEffect(() => {
+    if (!selectedNews) {
+      return;
+    }
 
-  const handleAddNews = React.useCallback((item: NewsItem) => {
-    setCustomNews((current) => sortNews([item, ...current]));
+    const currentItem = news.find((item) => item.id === selectedNews.id) ?? null;
+    if (!currentItem) {
+      setSelectedNews(null);
+      return;
+    }
+
+    if (currentItem !== selectedNews) {
+      setSelectedNews(currentItem);
+    }
+  }, [news, selectedNews]);
+
+  const handleSaveNews = React.useCallback((item: NewsItem) => {
+    setNews((current) => {
+      const exists = current.some((entry) => entry.id === item.id);
+      if (exists) {
+        return sortNews(current.map((entry) => (entry.id === item.id ? item : entry)));
+      }
+
+      return sortNews([item, ...current]);
+    });
+
+    setIsNewsModalOpen(false);
+    setEditingNews(null);
+  }, []);
+
+  const openCreateNews = React.useCallback(() => {
+    setEditingNews(null);
+    setIsNewsModalOpen(true);
+  }, []);
+
+  const openEditNews = React.useCallback((item: NewsItem) => {
+    setSelectedNews(null);
+    setEditingNews(item);
+    setIsNewsModalOpen(true);
+  }, []);
+
+  const handleDeleteNews = React.useCallback((item: NewsItem) => {
+    const shouldDelete = window.confirm(`ნამდვილად გსურთ სიახლის წაშლა: "${item.title}"?`);
+    if (!shouldDelete) {
+      return;
+    }
+
+    setNews((current) => current.filter((entry) => entry.id !== item.id));
+    setSelectedNews((current) => (current?.id === item.id ? null : current));
+    setEditingNews((current) => (current?.id === item.id ? null : current));
+    setIsNewsModalOpen(false);
   }, []);
 
   const currentDate = now.toLocaleDateString('ka-GE', {
@@ -131,7 +200,7 @@ export default function App() {
               <div className="flex items-center justify-between xl:justify-end gap-4 sm:gap-6 flex-wrap min-w-0">
                 {role === 'admin' && (
                   <button
-                    onClick={() => setIsAddNewsOpen(true)}
+                    onClick={openCreateNews}
                     className="px-5 py-3 rounded-2xl bg-blue-600 text-white text-[10px] font-bold uppercase tracking-[0.2em] shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-all flex items-center gap-2"
                   >
                     <Plus className="w-4 h-4" />
@@ -165,8 +234,10 @@ export default function App() {
                   <NewsPage
                     news={news}
                     canAddNews={role === 'admin'}
-                    onOpenAddNews={() => setIsAddNewsOpen(true)}
+                    onOpenAddNews={openCreateNews}
                     onOpenNews={setSelectedNews}
+                    onEditNews={openEditNews}
+                    onDeleteNews={handleDeleteNews}
                   />
                 }
               />
@@ -175,12 +246,22 @@ export default function App() {
         </main>
 
         <AddNewsModal
-          isOpen={isAddNewsOpen}
-          onClose={() => setIsAddNewsOpen(false)}
-          onAdd={handleAddNews}
+          isOpen={isNewsModalOpen}
+          onClose={() => {
+            setIsNewsModalOpen(false);
+            setEditingNews(null);
+          }}
+          onSave={handleSaveNews}
+          initialNews={editingNews}
         />
 
-        <NewsDetailModal item={selectedNews} onClose={() => setSelectedNews(null)} />
+        <NewsDetailModal
+          item={selectedNews}
+          onClose={() => setSelectedNews(null)}
+          canManage={role === 'admin'}
+          onEdit={openEditNews}
+          onDelete={handleDeleteNews}
+        />
       </div>
     </HashRouter>
   );

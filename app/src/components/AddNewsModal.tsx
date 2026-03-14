@@ -1,17 +1,24 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Plus, X } from 'lucide-react';
+import { Pencil, Plus, X } from 'lucide-react';
 import type { NewsItem } from '../types';
 
 interface AddNewsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAdd: (news: NewsItem) => void;
+  onSave: (news: NewsItem) => void;
+  initialNews?: NewsItem | null;
 }
 
-const categoryOptions: NewsItem['category'][] = ['ტრენინგი', 'სიახლე', 'განცხადება'];
+const categoryOptions: NewsItem['category'][] = [
+  'პროტოკოლი',
+  'სიახლე',
+  'ტრენინგი',
+  'ადმინისტრაციული',
+  'განცხადება',
+];
 
-export function AddNewsModal({ isOpen, onClose, onAdd }: AddNewsModalProps) {
+export function AddNewsModal({ isOpen, onClose, onSave, initialNews = null }: AddNewsModalProps) {
   const [title, setTitle] = React.useState('');
   const [summary, setSummary] = React.useState('');
   const [content, setContent] = React.useState('');
@@ -23,8 +30,14 @@ export function AddNewsModal({ isOpen, onClose, onAdd }: AddNewsModalProps) {
       setSummary('');
       setContent('');
       setCategory('ტრენინგი');
+      return;
     }
-  }, [isOpen]);
+
+    setTitle(initialNews?.title ?? '');
+    setSummary(initialNews?.summary ?? '');
+    setContent(initialNews?.content ?? '');
+    setCategory(initialNews?.category ?? 'ტრენინგი');
+  }, [initialNews, isOpen]);
 
   if (!isOpen) {
     return null;
@@ -34,18 +47,22 @@ export function AddNewsModal({ isOpen, onClose, onAdd }: AddNewsModalProps) {
     event.preventDefault();
 
     const createdAt = Date.now();
-
-    onAdd({
-      id: createdAt.toString(),
+    const nextItem: NewsItem = {
+      id: initialNews?.id ?? createdAt.toString(),
       title: title.trim(),
       summary: summary.trim() || 'ადმინისტრატორის მიერ დამატებული შიდა განახლება.',
       content: content.trim() || summary.trim() || 'ადმინისტრატორის მიერ დამატებული შიდა განახლება.',
       category,
-      date: new Date(createdAt).toLocaleDateString('ka-GE'),
-      createdAt,
-    });
+      date: initialNews?.date ?? new Date(createdAt).toLocaleDateString('ka-GE'),
+    };
 
-    onClose();
+    if (typeof initialNews?.createdAt === 'number') {
+      nextItem.createdAt = initialNews.createdAt;
+    } else if (!initialNews) {
+      nextItem.createdAt = createdAt;
+    }
+
+    onSave(nextItem);
   };
 
   return (
@@ -57,7 +74,9 @@ export function AddNewsModal({ isOpen, onClose, onAdd }: AddNewsModalProps) {
         className="bg-white w-full max-w-lg rounded-[3rem] p-10 shadow-2xl border border-white/60"
       >
         <div className="flex justify-between items-center mb-10">
-          <h3 className="text-2xl font-bold text-slate-900">სიახლის დამატება</h3>
+          <h3 className="text-2xl font-bold text-slate-900">
+            {initialNews ? 'სიახლის რედაქტირება' : 'სიახლის დამატება'}
+          </h3>
           <button
             onClick={onClose}
             className="p-2 hover:bg-slate-100 rounded-xl transition-colors"
@@ -128,8 +147,8 @@ export function AddNewsModal({ isOpen, onClose, onAdd }: AddNewsModalProps) {
             type="submit"
             className="w-full bg-blue-600 text-white py-5 rounded-2xl font-bold uppercase text-xs flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-colors"
           >
-            <Plus className="w-4 h-4" />
-            დამატება
+            {initialNews ? <Pencil className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+            {initialNews ? 'შენახვა' : 'დამატება'}
           </button>
         </form>
       </motion.div>
