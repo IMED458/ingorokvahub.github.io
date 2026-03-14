@@ -7,7 +7,6 @@ import {
   Users, 
   Link as LinkIcon, 
   Newspaper, 
-  Stethoscope,
   ChevronRight,
   LogOut,
   Bell,
@@ -16,6 +15,7 @@ import {
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useAuth } from '../context/AuthContext';
+import ingorokvaClinicLogo from '../assets/ingorokva-clinic-logo.svg';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'მთავარი' },
@@ -55,14 +55,12 @@ export function Sidebar() {
       )}>
         <div className="p-8">
           <div className="flex items-center justify-between mb-10">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-                <Stethoscope className="text-white w-5 h-5" />
-              </div>
-              <div>
-                <h1 className="font-extrabold text-lg tracking-tight leading-none text-slate-900">INGOROKVA</h1>
-                <p className="text-[9px] text-blue-600 font-bold tracking-[0.2em] uppercase opacity-80 mt-1">Medical Hub</p>
-              </div>
+            <div className="pr-3">
+              <img
+                src={ingorokvaClinicLogo}
+                alt="ინგოროყვას საუნივერსიტეტო კლინიკა"
+                className="h-14 w-auto max-w-[11.5rem] object-contain drop-shadow-[0_6px_16px_rgba(20,24,142,0.10)]"
+              />
             </div>
             <button 
               onClick={() => setIsOpen(false)}

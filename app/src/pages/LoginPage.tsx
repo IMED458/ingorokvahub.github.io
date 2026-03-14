@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { AlertCircle, ArrowRight, Lock, ShieldCheck } from 'lucide-react';
+import { AlertCircle, ArrowRight, Lock } from 'lucide-react';
+import ingorokvaClinicLogo from '../assets/ingorokva-clinic-logo.svg';
 import { useAuth } from '../context/AuthContext';
 
 export function LoginPage() {
@@ -28,9 +29,11 @@ export function LoginPage() {
         className="w-full max-w-md relative z-10"
       >
         <div className="text-center mb-12">
-          <div className="w-20 h-20 bg-blue-600 rounded-[2rem] flex items-center justify-center mx-auto mb-6 shadow-xl shadow-blue-500/20">
-            <ShieldCheck className="w-10 h-10 text-white" />
-          </div>
+          <img
+            src={ingorokvaClinicLogo}
+            alt="ინგოროყვას საუნივერსიტეტო კლინიკა"
+            className="h-28 sm:h-32 w-auto max-w-full object-contain mx-auto mb-6 drop-shadow-[0_10px_26px_rgba(20,24,142,0.10)]"
+          />
           <h1 className="text-3xl font-black text-slate-900 mb-2">MEDICAL HUB</h1>
           <p className="text-xs text-slate-400 font-bold uppercase tracking-[0.3em]">Secure Access</p>
         </div>
