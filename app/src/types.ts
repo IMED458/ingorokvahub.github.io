@@ -7,6 +7,19 @@ export interface NewsItem {
   content?: string;
 }
 
+export type ResourceIconName =
+  | 'Phone'
+  | 'Calculator'
+  | 'House'
+  | 'ClipboardPlus'
+  | 'RefreshCw'
+  | 'ShieldCheck'
+  | 'FileText'
+  | 'FlaskConical'
+  | 'Activity'
+  | 'BookOpen'
+  | 'Files';
+
 export interface Doctor {
   id: string;
   name: string;
@@ -26,7 +39,11 @@ export interface ResourceLink {
   title: string;
   description: string;
   url: string;
-  icon: string;
+  icon: ResourceIconName;
+  category: 'კომუნიკაცია' | 'კლინიკური პროცესები' | 'კლინიკური სისტემები' | 'ცოდნა და დოკუმენტები';
+  access: 'ვებ' | 'შიდა ქსელი' | 'გარე IP' | 'Google Drive';
+  note?: string;
+  featured?: boolean;
 }
 
 export interface KnowledgeMaterial {

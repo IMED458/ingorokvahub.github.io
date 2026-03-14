@@ -1,8 +1,9 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Search, Filter, FileText, Download, Star, ChevronRight, Clock } from 'lucide-react';
-import { KNOWLEDGE_BASE } from '../constants';
+import { Search, FileText, Star, ChevronRight, Clock, ExternalLink } from 'lucide-react';
+import { KNOWLEDGE_BASE, RESOURCES } from '../constants';
 import { cn } from '../lib/utils';
+import { ResourceIcon } from '../components/ResourceIcon';
 
 const categories = [
   'ყველა', 'კარდიოლოგია', 'ნევროლოგია', 'ქირურგია', 'რეანიმაცია', 'თერაპია', 'გინეკოლოგია', 'პედიატრია'
@@ -11,6 +12,8 @@ const categories = [
 export function KnowledgeHub() {
   const [activeCategory, setActiveCategory] = React.useState('ყველა');
   const [searchQuery, setSearchQuery] = React.useState('');
+  const knowledgeLinks = RESOURCES.filter((resource) => resource.category === 'ცოდნა და დოკუმენტები');
+  const knowledgeHubLink = knowledgeLinks.find((resource) => resource.id === 'knowledge-hub')?.url ?? '#';
 
   const filteredMaterials = KNOWLEDGE_BASE.filter(item => {
     const matchesCategory = activeCategory === 'ყველა' || item.specialty === activeCategory;
@@ -20,7 +23,7 @@ export function KnowledgeHub() {
   });
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8 sm:space-y-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <div className="flex items-center gap-3 mb-2">
@@ -41,6 +44,40 @@ export function KnowledgeHub() {
         </div>
       </div>
 
+      <div className="grid gap-5 lg:grid-cols-2">
+        {knowledgeLinks.map((resource, idx) => (
+          <motion.a
+            key={resource.id}
+            href={resource.url}
+            target="_blank"
+            rel="noreferrer"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: idx * 0.06 }}
+            className="group rounded-[2.5rem] border border-slate-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:border-blue-200 hover:shadow-2xl hover:shadow-blue-500/5 sm:p-8"
+          >
+            <div className="mb-5 flex items-start justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+                  <ResourceIcon name={resource.icon} className="h-7 w-7" />
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-400">{resource.access}</p>
+                  <h3 className="mt-1 text-xl font-bold text-slate-900">{resource.title}</h3>
+                </div>
+              </div>
+              <ExternalLink className="h-5 w-5 flex-shrink-0 text-slate-300 transition-colors group-hover:text-blue-600" />
+            </div>
+            <p className="mb-4 text-sm leading-relaxed text-slate-500">{resource.description}</p>
+            {resource.note && (
+              <p className="rounded-2xl bg-slate-50 px-4 py-3 text-xs leading-relaxed text-slate-500">
+                {resource.note}
+              </p>
+            )}
+          </motion.a>
+        ))}
+      </div>
+
       {/* Categories Scroll */}
       <div className="flex items-center gap-3 overflow-x-auto pb-4 no-scrollbar">
         {categories.map(cat => (
@@ -59,7 +96,7 @@ export function KnowledgeHub() {
         ))}
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
         {filteredMaterials.map((item, idx) => (
           <motion.div
             key={item.id}
@@ -104,12 +141,22 @@ export function KnowledgeHub() {
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <button className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
-                  <Download className="w-4 h-4" />
-                </button>
-                <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-slate-200 text-[10px] font-bold uppercase tracking-widest text-slate-900 hover:bg-slate-900 hover:text-white hover:border-slate-900 transition-all">
-                  ნახვა <ChevronRight className="w-3 h-3" />
-                </button>
+                <a
+                  href={knowledgeHubLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+                <a
+                  href={knowledgeHubLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-slate-200 text-[10px] font-bold uppercase tracking-widest text-slate-900 hover:bg-slate-900 hover:text-white hover:border-slate-900 transition-all"
+                >
+                  გახსნა ჰაბში <ChevronRight className="w-3 h-3" />
+                </a>
               </div>
             </div>
           </motion.div>
