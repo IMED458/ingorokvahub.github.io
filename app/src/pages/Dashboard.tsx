@@ -198,21 +198,21 @@ export function Dashboard({ news, onOpenNews }: DashboardProps) {
                 <Phone className="w-5 h-5" />
                 კორპორატიული ნომრები
               </h3>
-              <div className="space-y-4 sm:space-y-5">
+              <div className="space-y-4 sm:space-y-6">
                 {corporateNumbers.map((item, index) => (
                   <div key={item.department}>
-                    <div className="flex items-start justify-between gap-4 group">
-                      <span className="text-xs text-slate-400 font-semibold group-hover:text-slate-600 transition-colors leading-relaxed pr-4">
+                    <div className="flex justify-between items-center group gap-4">
+                      <span className="text-xs text-slate-400 font-semibold group-hover:text-slate-600 transition-colors">
                         {item.department}
                       </span>
                       <a
                         href={`tel:${sanitizePhone(item.phone)}`}
-                        className="font-mono text-lg sm:text-xl font-black text-slate-900 hover:text-blue-600 transition-colors whitespace-nowrap shrink-0"
+                        className="font-mono text-lg sm:text-xl font-black text-slate-900 whitespace-nowrap shrink-0"
                       >
                         {item.phone}
                       </a>
                     </div>
-                    {index < corporateNumbers.length - 1 && <div className="h-[1px] bg-slate-100 mt-4 sm:mt-5" />}
+                    {index < corporateNumbers.length - 1 && <div className="h-[1px] bg-slate-100" />}
                   </div>
                 ))}
               </div>
