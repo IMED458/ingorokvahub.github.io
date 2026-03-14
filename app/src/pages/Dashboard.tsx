@@ -192,51 +192,32 @@ export function Dashboard({ news, onOpenNews }: DashboardProps) {
           </section>
 
           {/* Corporate Numbers */}
-          <section className="relative overflow-hidden rounded-[3rem] border border-blue-100/90 bg-gradient-to-br from-white via-white to-blue-50/80 p-6 sm:p-8 shadow-[0_24px_80px_rgba(59,130,246,0.10)]">
+          <section className="glass-card p-6 sm:p-10 rounded-[3rem] relative overflow-hidden border-blue-100">
             <div className="relative z-10">
-              <h3 className="mb-6 sm:mb-8 flex items-center gap-3 text-sm font-bold uppercase tracking-[0.3em] text-blue-600">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
-                  <Phone className="w-5 h-5" />
-                </div>
+              <h3 className="text-sm font-bold uppercase tracking-[0.3em] text-blue-600 mb-6 sm:mb-8 flex items-center gap-3">
+                <Phone className="w-5 h-5" />
                 კორპორატიული ნომრები
               </h3>
-
-              <div className="grid gap-x-8 lg:grid-cols-2">
-                {Array.from({ length: Math.ceil(corporateNumbers.length / 2) }).map((_, columnIndex) => {
-                  const startIndex = columnIndex * Math.ceil(corporateNumbers.length / 2);
-                  const columnItems = corporateNumbers.slice(
-                    startIndex,
-                    startIndex + Math.ceil(corporateNumbers.length / 2),
-                  );
-
-                  return (
-                    <div
-                      key={`corporate-column-${columnIndex}`}
-                      className="overflow-hidden rounded-[2rem] bg-white/75 ring-1 ring-white/80 backdrop-blur-sm"
-                    >
-                      {columnItems.map((item, index) => (
-                        <div key={item.department}>
-                          <div className="flex items-center justify-between gap-4 px-4 sm:px-5 py-4 sm:py-5">
-                            <span className="text-sm font-semibold leading-snug text-slate-400 break-anywhere">
-                              {item.department}
-                            </span>
-                            <a
-                              href={`tel:${sanitizePhone(item.phone)}`}
-                              className="shrink-0 whitespace-nowrap font-mono text-lg sm:text-xl font-black text-slate-900 transition-colors hover:text-blue-600"
-                            >
-                              {item.phone}
-                            </a>
-                          </div>
-                          {index < columnItems.length - 1 && <div className="h-px bg-slate-100" />}
-                        </div>
-                      ))}
+              <div className="space-y-4 sm:space-y-5">
+                {corporateNumbers.map((item, index) => (
+                  <div key={item.department}>
+                    <div className="flex items-start justify-between gap-4 group">
+                      <span className="text-xs text-slate-400 font-semibold group-hover:text-slate-600 transition-colors leading-relaxed pr-4">
+                        {item.department}
+                      </span>
+                      <a
+                        href={`tel:${sanitizePhone(item.phone)}`}
+                        className="font-mono text-lg sm:text-xl font-black text-slate-900 hover:text-blue-600 transition-colors whitespace-nowrap shrink-0"
+                      >
+                        {item.phone}
+                      </a>
                     </div>
-                  );
-                })}
+                    {index < corporateNumbers.length - 1 && <div className="h-[1px] bg-slate-100 mt-4 sm:mt-5" />}
+                  </div>
+                ))}
               </div>
             </div>
-            <div className="absolute -right-12 -bottom-12 h-48 w-48 rounded-full bg-blue-500 blur-[100px] opacity-10" />
-            <div className="absolute -left-10 top-20 h-28 w-28 rounded-full bg-blue-100 blur-[70px] opacity-60" />
+            <div className="absolute -right-10 -bottom-10 w-48 h-48 bg-blue-500 rounded-full blur-[100px] opacity-10 animate-pulse" />
           </section>
         </div>
       </div>
