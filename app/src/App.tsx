@@ -7,7 +7,6 @@ import { NewsDetailModal } from './components/NewsDetailModal';
 import { NotificationsModal } from './components/NotificationsModal';
 import { Sidebar } from './components/Sidebar';
 import { useAuth } from './context/AuthContext';
-import { NEWS } from './constants';
 import { firestore, enableFirebaseAnalytics } from './lib/firebase';
 import {
   getInitialNewsState,
@@ -31,20 +30,9 @@ import type { NewsItem } from './types';
 
 const NEWS_COLLECTION = 'news';
 
-function upsertNewsLocally(current: NewsItem[], item: NewsItem) {
-  const exists = current.some((entry) => entry.id === item.id);
-  if (exists) {
-    return sortNews(current.map((entry) => (entry.id === item.id ? item : entry)));
-  }
-
-  return sortNews([item, ...current]);
-}
-
 export default function App() {
   const { isAuthenticated, role, isLoading } = useAuth();
-  const initialNews = React.useMemo(() => getInitialNewsState(NEWS), []);
-  const initialNewsRef = React.useRef(initialNews);
-  const hasMigratedInitialNewsRef = React.useRef(false);
+  const initialNews = React.useMemo(() => getInitialNewsState([]), []);
   const [now, setNow] = React.useState(() => new Date());
   const [isNewsModalOpen, setIsNewsModalOpen] = React.useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = React.useState(false);
@@ -82,42 +70,20 @@ export default function App() {
     const unsubscribe = onSnapshot(
       newsCollectionRef,
       (snapshot) => {
-        const remoteNews = sortNews(
-          snapshot.docs.map((snapshotDoc) =>
-            normalizeNewsItem({
-              id: snapshotDoc.id,
-              ...(snapshotDoc.data() as Omit<NewsItem, 'id'>),
-            }),
+        setNews(
+          sortNews(
+            snapshot.docs.map((snapshotDoc) =>
+              normalizeNewsItem({
+                id: snapshotDoc.id,
+                ...(snapshotDoc.data() as Omit<NewsItem, 'id'>),
+              }),
+            ),
           ),
         );
-
-        if (!hasMigratedInitialNewsRef.current) {
-          hasMigratedInitialNewsRef.current = true;
-
-          const remoteIds = new Set(remoteNews.map((item) => item.id));
-          const missingLocalNews = initialNewsRef.current
-            .map(normalizeNewsItem)
-            .filter((item) => !remoteIds.has(item.id));
-
-          if (missingLocalNews.length > 0) {
-            void Promise.all(
-              missingLocalNews.map((item) => setDoc(doc(newsCollectionRef, item.id), item)),
-            ).catch((error) => {
-              console.error('Failed to migrate local news to Firebase.', error);
-            });
-
-            if (remoteNews.length === 0) {
-              setNews(sortNews(missingLocalNews));
-              return;
-            }
-          }
-        }
-
-        setNews(remoteNews.length > 0 ? remoteNews : initialNewsRef.current);
       },
       (error) => {
         console.error('Failed to subscribe to Firebase news.', error);
-        setNews(getInitialNewsState(NEWS));
+        setNews(getInitialNewsState([]));
       },
     );
 
@@ -175,12 +141,11 @@ export default function App() {
 
     try {
       await setDoc(doc(firestore, NEWS_COLLECTION, normalizedItem.id), normalizedItem);
-    } catch (error) {
-      console.error('Failed to save news in Firebase.', error);
-      setNews((current) => upsertNewsLocally(current, normalizedItem));
-    } finally {
       setIsNewsModalOpen(false);
       setEditingNews(null);
+    } catch (error) {
+      console.error('Failed to save news in Firebase.', error);
+      window.alert('სიახლის შენახვა ვერ მოხერხდა. გადაამოწმეთ admin ავტორიზაცია და Firebase წვდომა.');
     }
   }, []);
 
@@ -203,13 +168,12 @@ export default function App() {
 
     try {
       await deleteDoc(doc(firestore, NEWS_COLLECTION, item.id));
-    } catch (error) {
-      console.error('Failed to delete news in Firebase.', error);
-      setNews((current) => current.filter((entry) => entry.id !== item.id));
-    } finally {
       setSelectedNews((current) => (current?.id === item.id ? null : current));
       setEditingNews((current) => (current?.id === item.id ? null : current));
       setIsNewsModalOpen(false);
+    } catch (error) {
+      console.error('Failed to delete news in Firebase.', error);
+      window.alert('სიახლის წაშლა ვერ მოხერხდა. გადაამოწმეთ admin ავტორიზაცია და Firebase წვდომა.');
     }
   }, []);
 
