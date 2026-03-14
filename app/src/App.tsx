@@ -2,6 +2,7 @@ import React from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import { Bell, Plus } from 'lucide-react';
 import { AddNewsModal } from './components/AddNewsModal';
+import { NewsDetailModal } from './components/NewsDetailModal';
 import { Sidebar } from './components/Sidebar';
 import { useAuth } from './context/AuthContext';
 import { NEWS } from './constants';
@@ -63,6 +64,7 @@ export default function App() {
   const [now, setNow] = React.useState(() => new Date());
   const [isAddNewsOpen, setIsAddNewsOpen] = React.useState(false);
   const [customNews, setCustomNews] = React.useState<NewsItem[]>(getSavedCustomNews);
+  const [selectedNews, setSelectedNews] = React.useState<NewsItem | null>(null);
 
   React.useEffect(() => {
     window.localStorage.setItem(CUSTOM_NEWS_STORAGE_KEY, JSON.stringify(customNews));
@@ -78,6 +80,12 @@ export default function App() {
       setIsAddNewsOpen(false);
     }
   }, [role]);
+
+  React.useEffect(() => {
+    if (!isAuthenticated) {
+      setSelectedNews(null);
+    }
+  }, [isAuthenticated]);
 
   const news = React.useMemo(() => sortNews([...NEWS, ...customNews]), [customNews]);
 
@@ -143,7 +151,10 @@ export default function App() {
             </header>
 
             <Routes>
-              <Route path="/" element={<Dashboard news={news} />} />
+              <Route
+                path="/"
+                element={<Dashboard news={news} onOpenNews={setSelectedNews} />}
+              />
               <Route path="/knowledge" element={<KnowledgeHub />} />
               <Route path="/patient-flow" element={<PatientFlow />} />
               <Route path="/doctors" element={<DoctorsDirectory />} />
@@ -155,6 +166,7 @@ export default function App() {
                     news={news}
                     canAddNews={role === 'admin'}
                     onOpenAddNews={() => setIsAddNewsOpen(true)}
+                    onOpenNews={setSelectedNews}
                   />
                 }
               />
@@ -167,6 +179,8 @@ export default function App() {
           onClose={() => setIsAddNewsOpen(false)}
           onAdd={handleAddNews}
         />
+
+        <NewsDetailModal item={selectedNews} onClose={() => setSelectedNews(null)} />
       </div>
     </HashRouter>
   );

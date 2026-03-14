@@ -14,12 +14,14 @@ const categoryOptions: NewsItem['category'][] = ['ტრენინგი', '�
 export function AddNewsModal({ isOpen, onClose, onAdd }: AddNewsModalProps) {
   const [title, setTitle] = React.useState('');
   const [summary, setSummary] = React.useState('');
+  const [content, setContent] = React.useState('');
   const [category, setCategory] = React.useState<NewsItem['category']>('ტრენინგი');
 
   React.useEffect(() => {
     if (!isOpen) {
       setTitle('');
       setSummary('');
+      setContent('');
       setCategory('ტრენინგი');
     }
   }, [isOpen]);
@@ -37,6 +39,7 @@ export function AddNewsModal({ isOpen, onClose, onAdd }: AddNewsModalProps) {
       id: createdAt.toString(),
       title: title.trim(),
       summary: summary.trim() || 'ადმინისტრატორის მიერ დამატებული შიდა განახლება.',
+      content: content.trim() || summary.trim() || 'ადმინისტრატორის მიერ დამატებული შიდა განახლება.',
       category,
       date: new Date(createdAt).toLocaleDateString('ka-GE'),
       createdAt,
@@ -88,6 +91,19 @@ export function AddNewsModal({ isOpen, onClose, onAdd }: AddNewsModalProps) {
               rows={4}
               className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all resize-none"
               placeholder="მოკლე აღწერა სიახლის ბარათისთვის"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-2">
+              სრული ტექსტი
+            </label>
+            <textarea
+              value={content}
+              onChange={(event) => setContent(event.target.value)}
+              rows={6}
+              className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all resize-none"
+              placeholder="სრული ტექსტი სრულად წაკითხვის ფანჯრისთვის"
             />
           </div>
 

@@ -51,9 +51,10 @@ const iconMap: Record<string, any> = {
 
 interface DashboardProps {
   news: NewsItem[];
+  onOpenNews: (item: NewsItem) => void;
 }
 
-export function Dashboard({ news }: DashboardProps) {
+export function Dashboard({ news, onOpenNews }: DashboardProps) {
   return (
     <div className="space-y-12">
       {/* Main Grid */}
@@ -120,7 +121,12 @@ export function Dashboard({ news }: DashboardProps) {
             </div>
             <div className="grid gap-5">
               {news.slice(0, 4).map((item) => (
-                <div key={item.id} className="glass-card p-5 sm:p-7 rounded-[2.5rem] flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-8 group glass-card-hover">
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => onOpenNews(item)}
+                  className="w-full text-left glass-card p-5 sm:p-7 rounded-[2.5rem] flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-8 group glass-card-hover cursor-pointer"
+                >
                   <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-all duration-500 shrink-0">
                     <Clock className="w-6 h-6 sm:w-7 sm:h-7" />
                   </div>
@@ -132,7 +138,7 @@ export function Dashboard({ news }: DashboardProps) {
                     <h4 className="font-bold text-slate-900 text-base sm:text-lg group-hover:text-blue-600 transition-colors">{item.title}</h4>
                   </div>
                   <ArrowRight className="hidden sm:block w-6 h-6 text-slate-200 group-hover:text-blue-600 group-hover:translate-x-2 transition-all duration-500" />
-                </div>
+                </button>
               ))}
             </div>
             {news.length === 0 && (

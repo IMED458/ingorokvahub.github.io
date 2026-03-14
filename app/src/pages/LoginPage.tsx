@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { AlertCircle, ArrowRight, Lock } from 'lucide-react';
-import ingorokvaClinicLogo from '../assets/ingorokva-clinic-logo.svg';
+import ingorokvaClinicLogo from '../assets/tm-center-logo.png';
 import { useAuth } from '../context/AuthContext';
 
 export function LoginPage() {
@@ -32,7 +32,7 @@ export function LoginPage() {
           <img
             src={ingorokvaClinicLogo}
             alt="ინგოროყვას საუნივერსიტეტო კლინიკა"
-            className="h-28 sm:h-32 w-auto max-w-full object-contain mx-auto mb-6 drop-shadow-[0_10px_26px_rgba(20,24,142,0.10)]"
+            className="h-28 sm:h-32 w-auto max-w-full object-contain mx-auto mb-6"
           />
           <h1 className="text-3xl font-black text-slate-900 mb-2">MEDICAL HUB</h1>
           <p className="text-xs text-slate-400 font-bold uppercase tracking-[0.3em]">Secure Access</p>

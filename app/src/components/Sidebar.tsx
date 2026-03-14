@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useAuth } from '../context/AuthContext';
-import ingorokvaClinicLogo from '../assets/ingorokva-clinic-logo.svg';
+import ingorokvaClinicLogo from '../assets/tm-center-logo.png';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'მთავარი' },
@@ -59,7 +59,7 @@ export function Sidebar() {
               <img
                 src={ingorokvaClinicLogo}
                 alt="ინგოროყვას საუნივერსიტეტო კლინიკა"
-                className="h-14 w-auto max-w-[11.5rem] object-contain drop-shadow-[0_6px_16px_rgba(20,24,142,0.10)]"
+                className="h-14 w-auto max-w-[11.5rem] object-contain"
               />
             </div>
             <button 

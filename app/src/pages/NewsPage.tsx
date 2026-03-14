@@ -8,9 +8,10 @@ interface NewsPageProps {
   news: NewsItem[];
   canAddNews: boolean;
   onOpenAddNews: () => void;
+  onOpenNews: (item: NewsItem) => void;
 }
 
-export function NewsPage({ news, canAddNews, onOpenAddNews }: NewsPageProps) {
+export function NewsPage({ news, canAddNews, onOpenAddNews, onOpenNews }: NewsPageProps) {
   const [activeCategory, setActiveCategory] = React.useState('ყველა');
   const [searchQuery, setSearchQuery] = React.useState('');
   const categories = React.useMemo(
@@ -80,12 +81,14 @@ export function NewsPage({ news, canAddNews, onOpenAddNews }: NewsPageProps) {
 
       <div className="grid gap-6">
         {filteredNews.map((item, idx) => (
-          <motion.div
+          <motion.button
             key={item.id}
+            type="button"
+            onClick={() => onOpenNews(item)}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: idx * 0.1 }}
-            className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-2xl hover:shadow-blue-500/5 hover:border-blue-200 transition-all group cursor-pointer"
+            className="w-full text-left bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-2xl hover:shadow-blue-500/5 hover:border-blue-200 transition-all group cursor-pointer"
           >
             <div className="flex flex-col md:flex-row gap-8 items-start">
               <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors flex-shrink-0">
@@ -112,7 +115,7 @@ export function NewsPage({ news, canAddNews, onOpenAddNews }: NewsPageProps) {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </motion.button>
         ))}
       </div>
 
