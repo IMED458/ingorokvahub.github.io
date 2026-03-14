@@ -41,7 +41,7 @@ function upsertNewsLocally(current: NewsItem[], item: NewsItem) {
 }
 
 export default function App() {
-  const { isAuthenticated, role } = useAuth();
+  const { isAuthenticated, role, isLoading } = useAuth();
   const initialNews = React.useMemo(() => getInitialNewsState(NEWS), []);
   const initialNewsRef = React.useRef(initialNews);
   const hasMigratedInitialNewsRef = React.useRef(false);
@@ -235,6 +235,17 @@ export default function App() {
     second: '2-digit',
     timeZone: 'Asia/Tbilisi',
   });
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]">
+        <div className="flex items-center gap-3 rounded-2xl bg-white/80 px-6 py-4 border border-white shadow-xl">
+          <div className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse" />
+          <p className="text-sm font-semibold text-slate-500">ავტორიზაცია მოწმდება...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return <LoginPage />;

@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAnalytics, isSupported, type Analytics } from 'firebase/analytics';
+import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -14,6 +15,9 @@ const firebaseConfig = {
 
 export const firebaseApp = initializeApp(firebaseConfig);
 export const firestore = getFirestore(firebaseApp);
+export const firebaseAuth = getAuth(firebaseApp);
+export const firebaseAdminEmail =
+  import.meta.env.VITE_FIREBASE_ADMIN_EMAIL?.trim() || 'admin@ingorokvahub.local';
 
 let analyticsPromise: Promise<Analytics | null> | null = null;
 

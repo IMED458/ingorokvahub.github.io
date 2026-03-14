@@ -1,49 +1,81 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { firebaseAdminEmail, firebaseAuth } from '../lib/firebase';
 
 export type Role = 'user' | 'admin' | null;
 
 interface AuthContextType {
   role: Role;
-  login: (password: string) => boolean;
-  logout: () => void;
+  login: (password: string) => Promise<boolean>;
+  logout: () => Promise<void>;
   isAuthenticated: boolean;
+  isLoading: boolean;
 }
 
 const AUTH_STORAGE_KEY = 'medhub_role';
+const USER_PASSWORD = '2026';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-function getSavedRole(): Role {
+function getSavedUserRole(): Role {
   if (typeof window === 'undefined') {
     return null;
   }
 
-  const savedRole = window.localStorage.getItem(AUTH_STORAGE_KEY);
-  return savedRole === 'admin' || savedRole === 'user' ? savedRole : null;
+  return window.localStorage.getItem(AUTH_STORAGE_KEY) === 'user' ? 'user' : null;
 }
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [role, setRole] = useState<Role>(getSavedRole);
+  const [role, setRole] = useState<Role>(getSavedUserRole);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const login = (password: string) => {
-    if (password === 'admin1') {
-      setRole('admin');
-      window.localStorage.setItem(AUTH_STORAGE_KEY, 'admin');
-      return true;
-    }
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
+      if (user?.email === firebaseAdminEmail) {
+        setRole('admin');
+      } else {
+        setRole(getSavedUserRole());
+      }
 
-    if (password === '2026') {
-      setRole('user');
+      setIsLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const login = async (password: string) => {
+    if (password === USER_PASSWORD) {
       window.localStorage.setItem(AUTH_STORAGE_KEY, 'user');
+      setRole('user');
       return true;
     }
 
-    return false;
+    try {
+      const credential = await signInWithEmailAndPassword(firebaseAuth, firebaseAdminEmail, password);
+
+      if (credential.user.email !== firebaseAdminEmail) {
+        await signOut(firebaseAuth);
+        return false;
+      }
+
+      window.localStorage.removeItem(AUTH_STORAGE_KEY);
+      setRole('admin');
+      return true;
+    } catch {
+      return false;
+    }
   };
 
-  const logout = () => {
-    setRole(null);
+  const logout = async () => {
     window.localStorage.removeItem(AUTH_STORAGE_KEY);
+
+    try {
+      if (firebaseAuth.currentUser) {
+        await signOut(firebaseAuth);
+      }
+    } finally {
+      setRole(null);
+    }
   };
 
   return (
@@ -53,6 +85,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         login,
         logout,
         isAuthenticated: role !== null,
+        isLoading,
       }}
     >
       {children}

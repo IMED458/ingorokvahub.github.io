@@ -7,15 +7,21 @@ import { useAuth } from '../context/AuthContext';
 export function LoginPage() {
   const [password, setPassword] = React.useState('');
   const [error, setError] = React.useState(false);
-  const { login } = useAuth();
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const { login, isLoading } = useAuth();
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setIsSubmitting(true);
 
-    if (!login(password)) {
+    const isSuccess = await login(password);
+
+    if (!isSuccess) {
       setError(true);
       setPassword('');
     }
+
+    setIsSubmitting(false);
   };
 
   return (
@@ -53,6 +59,7 @@ export function LoginPage() {
                 <input
                   type="password"
                   value={password}
+                  disabled={isSubmitting || isLoading}
                   onChange={(event) => {
                     setPassword(event.target.value);
                     setError(false);
@@ -75,9 +82,10 @@ export function LoginPage() {
 
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-5 rounded-2xl font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20 group"
+              disabled={isSubmitting || isLoading}
+              className="w-full bg-blue-600 text-white py-5 rounded-2xl font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20 group disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              შესვლა
+              {isSubmitting || isLoading ? 'იტვირთება...' : 'შესვლა'}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>
           </form>
