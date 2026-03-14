@@ -23,8 +23,9 @@ import {
   Files
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { NEWS, RESOURCES } from '../constants';
+import { RESOURCES } from '../constants';
 import { cn } from '../lib/utils';
+import type { NewsItem } from '../types';
 
 const quickActions = [
   { title: 'ცოდნის პლატფორმა', icon: BookOpen, to: '/knowledge', color: 'text-blue-600', bg: 'bg-blue-50' },
@@ -48,7 +49,11 @@ const iconMap: Record<string, any> = {
   Files
 };
 
-export function Dashboard() {
+interface DashboardProps {
+  news: NewsItem[];
+}
+
+export function Dashboard({ news }: DashboardProps) {
   return (
     <div className="space-y-12">
       {/* Main Grid */}
@@ -114,7 +119,7 @@ export function Dashboard() {
               </Link>
             </div>
             <div className="grid gap-5">
-              {NEWS.map((item) => (
+              {news.slice(0, 4).map((item) => (
                 <div key={item.id} className="glass-card p-5 sm:p-7 rounded-[2.5rem] flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-8 group glass-card-hover">
                   <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-all duration-500 shrink-0">
                     <Clock className="w-6 h-6 sm:w-7 sm:h-7" />
@@ -130,6 +135,11 @@ export function Dashboard() {
                 </div>
               ))}
             </div>
+            {news.length === 0 && (
+              <div className="glass-card p-10 rounded-[2.5rem] text-center">
+                <p className="text-sm font-semibold text-slate-500">სიახლეები ჯერ არ დამატებულა</p>
+              </div>
+            )}
           </section>
         </div>
 

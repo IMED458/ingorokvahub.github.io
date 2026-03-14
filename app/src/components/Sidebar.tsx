@@ -15,6 +15,7 @@ import {
   X
 } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { useAuth } from '../context/AuthContext';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'მთავარი' },
@@ -26,6 +27,9 @@ const navItems = [
 
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
+  const { role, logout } = useAuth();
+  const roleLabel = role === 'admin' ? 'ადმინისტრატორი' : 'თანამშრომელი';
+  const initials = role === 'admin' ? 'AD' : 'US';
 
   return (
     <>
@@ -101,9 +105,21 @@ export function Sidebar() {
         <div className="mt-auto p-8 space-y-6">
           <div className="p-5 bg-slate-50/50 rounded-3xl border border-slate-100">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center text-[10px] font-bold border border-slate-200 text-slate-600 shadow-sm">GA</div>
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center text-[10px] font-bold border border-slate-200 text-slate-600 shadow-sm">
+                {initials}
+              </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Access</p>
+                <p className="text-sm font-semibold text-slate-900">{roleLabel}</p>
+              </div>
             </div>
-            <button className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-white text-[10px] font-bold text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-all border border-slate-100 shadow-sm">
+            <button
+              onClick={() => {
+                setIsOpen(false);
+                logout();
+              }}
+              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-white text-[10px] font-bold text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-all border border-slate-100 shadow-sm"
+            >
               <LogOut className="w-3 h-3" />
               გასვლა
             </button>

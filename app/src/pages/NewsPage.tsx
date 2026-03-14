@@ -1,16 +1,32 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Newspaper, Clock, Tag, ChevronRight, Search } from 'lucide-react';
-import { NEWS } from '../constants';
+import { Clock, Newspaper, ChevronRight, Plus, Search } from 'lucide-react';
 import { cn } from '../lib/utils';
+import type { NewsItem } from '../types';
 
-export function NewsPage() {
+interface NewsPageProps {
+  news: NewsItem[];
+  canAddNews: boolean;
+  onOpenAddNews: () => void;
+}
+
+export function NewsPage({ news, canAddNews, onOpenAddNews }: NewsPageProps) {
   const [activeCategory, setActiveCategory] = React.useState('ყველა');
-  const categories = ['ყველა', 'პროტოკოლი', 'სიახლე', 'ტრენინგი', 'ადმინისტრაციული'];
-
-  const filteredNews = NEWS.filter(item => 
-    activeCategory === 'ყველა' || item.category === activeCategory
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const categories = React.useMemo(
+    () => ['ყველა', ...new Set(news.map((item) => item.category))],
+    [news],
   );
+
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+  const filteredNews = news.filter((item) => {
+    const matchesCategory = activeCategory === 'ყველა' || item.category === activeCategory;
+    const matchesSearch =
+      normalizedQuery.length === 0 ||
+      `${item.title} ${item.summary} ${item.category}`.toLowerCase().includes(normalizedQuery);
+
+    return matchesCategory && matchesSearch;
+  });
 
   return (
     <div className="space-y-10">
@@ -22,13 +38,26 @@ export function NewsPage() {
           </div>
           <h2 className="text-3xl font-bold text-slate-900">განახლებები</h2>
         </div>
-        <div className="relative group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
-          <input 
-            type="text" 
-            placeholder="ძიება სიახლეებში..." 
-            className="pl-12 pr-6 py-4 bg-white border border-slate-200 rounded-2xl w-full md:w-96 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 shadow-sm transition-all"
-          />
+        <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+          <div className="relative group flex-1 md:flex-none">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="ძიება სიახლეებში..."
+              className="pl-12 pr-6 py-4 bg-white border border-slate-200 rounded-2xl w-full md:w-96 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 shadow-sm transition-all"
+            />
+          </div>
+          {canAddNews && (
+            <button
+              onClick={onOpenAddNews}
+              className="px-6 py-4 bg-blue-600 text-white rounded-2xl font-bold uppercase tracking-[0.2em] text-[10px] flex items-center justify-center gap-3 hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20"
+            >
+              <Plus className="w-4 h-4" />
+              სიახლის დამატება
+            </button>
+          )}
         </div>
       </div>
 
@@ -93,7 +122,7 @@ export function NewsPage() {
             <Newspaper className="w-8 h-8 text-slate-300" />
           </div>
           <h3 className="text-xl font-bold text-slate-900 mb-2">სიახლეები ვერ მოიძებნა</h3>
-          <p className="text-sm text-slate-400 font-medium uppercase tracking-widest">სცადეთ სხვა კატეგორია</p>
+          <p className="text-sm text-slate-400 font-medium uppercase tracking-widest">სცადეთ სხვა კატეგორია ან საძიებო სიტყვა</p>
         </div>
       )}
     </div>

@@ -2,9 +2,10 @@ export interface NewsItem {
   id: string;
   title: string;
   date: string;
-  category: 'პროტოკოლი' | 'სიახლე' | 'ტრენინგი' | 'ადმინისტრაციული';
+  category: 'პროტოკოლი' | 'სიახლე' | 'ტრენინგი' | 'ადმინისტრაციული' | 'განცხადება';
   summary: string;
   content?: string;
+  createdAt?: number;
 }
 
 export interface ResourceLink {
