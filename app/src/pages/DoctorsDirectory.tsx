@@ -1,123 +1,197 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Search, Phone, Mail, Building2, ChevronRight, User } from 'lucide-react';
-import { DOCTORS } from '../constants';
+import { Copy, ExternalLink, Phone, Search, UserRound } from 'lucide-react';
+import { PHONE_DIRECTORY_URL } from '../constants';
+import { directoryDoctors, directoryDoctorsMeta } from '../data/generated/doctors';
 import { cn } from '../lib/utils';
+
+function getInitials(fullName: string) {
+  return fullName
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join('')
+    .toUpperCase();
+}
+
+function sanitizePhone(phone: string) {
+  return phone.replace(/\D/g, '');
+}
 
 export function DoctorsDirectory() {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [activeDept, setActiveDept] = React.useState('ყველა');
+  const [copiedDoctorId, setCopiedDoctorId] = React.useState<string | null>(null);
 
-  const departments = ['ყველა', ...new Set(DOCTORS.map(d => d.department))];
+  const departments = ['ყველა', ...new Set(directoryDoctors.map((doctor) => doctor.department))];
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+  const syncedAtLabel = new Date(directoryDoctorsMeta.syncedAt).toLocaleString('ka-GE');
 
-  const filteredDoctors = DOCTORS.filter(doc => {
-    const matchesDept = activeDept === 'ყველა' || doc.department === activeDept;
-    const fullName = `${doc.name} ${doc.surname}`.toLowerCase();
-    const matchesSearch = fullName.includes(searchQuery.toLowerCase()) || 
-                         doc.specialty.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredDoctors = directoryDoctors.filter((doctor) => {
+    const matchesDept = activeDept === 'ყველა' || doctor.department === activeDept;
+    const matchesSearch = normalizedQuery.length === 0 || doctor.searchText.includes(normalizedQuery);
     return matchesDept && matchesSearch;
   });
 
+  const handleCopyPhone = async (doctorId: string, phone: string) => {
+    await navigator.clipboard.writeText(phone);
+    setCopiedDoctorId(doctorId);
+    window.setTimeout(() => setCopiedDoctorId(null), 1800);
+  };
+
   return (
-    <div className="space-y-10">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div className="space-y-12">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
         <div>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="h-6 w-1 bg-blue-600 rounded-full" />
-            <h3 className="text-sm font-bold uppercase tracking-widest text-slate-500">პერსონალი</h3>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="h-8 w-1.5 bg-gradient-to-b from-blue-500 to-indigo-600 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.2)]" />
+            <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-slate-400">პერსონალი</h3>
           </div>
-          <h2 className="text-3xl font-bold text-slate-900">ექიმების დირექტორია</h2>
+          <h2 className="text-4xl font-extrabold text-gradient tracking-tight">ექიმების დირექტორია</h2>
         </div>
-        <div className="relative group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
-          <input 
-            type="text" 
-            placeholder="ძიება სახელით ან სპეციალობით..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-12 pr-6 py-4 bg-white border border-slate-200 rounded-2xl w-full md:w-96 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 shadow-sm transition-all"
-          />
+
+        <div className="flex flex-col sm:flex-row items-center gap-4">
+          <div className="relative group w-full sm:w-auto">
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+            <input
+              type="text"
+              placeholder="ძიება სახელით, სპეციალობით ან ნომრით..."
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              className="pl-14 pr-8 py-5 glass-card rounded-[2rem] w-full md:w-96 outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/5 transition-all text-sm font-medium"
+            />
+          </div>
+
+          <a
+            href={PHONE_DIRECTORY_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-3 px-8 py-5 bg-blue-600 text-white rounded-[2rem] hover:bg-blue-700 transition-all font-bold text-xs uppercase tracking-widest shadow-lg shadow-blue-500/20"
+          >
+            phone ბაზა
+            <ExternalLink className="w-4 h-4" />
+          </a>
+        </div>
+      </div>
+
+      <div className="glass-card rounded-[2.5rem] p-6 sm:p-8 flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-8">
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600">
+            <UserRound className="w-7 h-7" />
+          </div>
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-400">მონაცემის წყარო</p>
+            <h3 className="text-lg font-bold text-slate-900">phone.imed.com.ge-ის გაერთიანებული დირექტორია</h3>
+          </div>
+        </div>
+        <div className="flex-1 grid sm:grid-cols-2 gap-4">
+          <div className="rounded-2xl bg-slate-50 px-4 py-3">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">ჩანაწერები</p>
+            <p className="mt-1 text-xl font-black text-slate-900">{directoryDoctorsMeta.doctorCount}</p>
+          </div>
+          <div className="rounded-2xl bg-slate-50 px-4 py-3">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">განახლდა</p>
+            <p className="mt-1 text-sm font-bold text-slate-900">{syncedAtLabel}</p>
+          </div>
         </div>
       </div>
 
       <div className="flex items-center gap-3 overflow-x-auto pb-4 no-scrollbar">
-        {departments.map(dept => (
+        {departments.map((department) => (
           <button
-            key={dept}
-            onClick={() => setActiveDept(dept)}
+            key={department}
+            onClick={() => setActiveDept(department)}
             className={cn(
-              "px-6 py-3 rounded-2xl text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-all border",
-              activeDept === dept 
-                ? "bg-slate-900 text-white border-slate-900 shadow-xl shadow-slate-900/10" 
-                : "bg-white text-slate-500 border-slate-200 hover:border-blue-300 hover:text-blue-600"
+              'px-8 py-3.5 rounded-2xl text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-all duration-500 border',
+              activeDept === department
+                ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-500/20'
+                : 'glass-card text-slate-500 hover:text-slate-900 border-slate-100',
             )}
           >
-            {dept}
+            {department}
           </button>
         ))}
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {filteredDoctors.map((doc, idx) => (
-          <motion.div
-            key={doc.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.05 }}
-            className="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden hover:shadow-2xl hover:shadow-blue-500/5 hover:border-blue-200 transition-all group"
+      <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
+        {filteredDoctors.map((doctor, index) => (
+          <motion.article
+            key={doctor.id}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: index * 0.03 }}
+            className="glass-card rounded-[2.5rem] overflow-hidden glass-card-hover group"
           >
-            <div className="p-8">
+            <div className="p-6 sm:p-8">
               <div className="flex items-center gap-5 mb-8">
-                <div className="relative">
-                  <div className="w-20 h-20 rounded-3xl overflow-hidden border-2 border-slate-100 group-hover:border-blue-200 transition-colors">
-                    <img 
-                      src={doc.image} 
-                      alt={doc.name} 
-                      className="w-full h-full object-cover"
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
-                  <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 border-4 border-white rounded-full shadow-sm" />
+                <div className="w-20 h-20 rounded-[2rem] bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-blue-500/20">
+                  {getInitials(doctor.fullName)}
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-slate-900 leading-tight mb-1">
-                    {doc.name} {doc.surname}
+                  <h3 className="text-xl font-bold text-slate-900 leading-tight mb-2 group-hover:text-blue-600 transition-colors">
+                    {doctor.fullName}
                   </h3>
-                  <p className="text-blue-600 text-xs font-bold uppercase tracking-widest">{doc.specialty}</p>
+                  <p className="text-blue-600 text-[10px] font-bold uppercase tracking-[0.2em]">{doctor.specialty}</p>
                 </div>
               </div>
 
               <div className="space-y-4 mb-8">
-                <div className="flex items-center gap-4 text-sm text-slate-600 bg-slate-50 p-3 rounded-2xl border border-slate-100">
-                  <Building2 className="w-4 h-4 text-slate-400" />
-                  <span className="font-medium">{doc.department}</span>
+                <div className="rounded-2xl border border-slate-100 bg-slate-50/70 px-4 py-4">
+                  <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-400">ტელეფონის ნომერი</p>
+                  <a
+                    href={`tel:${sanitizePhone(doctor.phone)}`}
+                    className="mt-2 inline-flex items-center gap-3 text-lg font-black text-slate-900 hover:text-blue-600 transition-colors"
+                  >
+                    <Phone className="w-4 h-4" />
+                    {doctor.phone}
+                  </a>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="flex flex-col gap-1 p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">შიდა ნომერი</span>
-                    <span className="font-mono font-bold text-slate-900">{doc.internalPhone}</span>
-                  </div>
-                  <div className="flex flex-col gap-1 p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">სტატუსი</span>
-                    <span className="text-[10px] font-bold text-emerald-600 uppercase">Active</span>
-                  </div>
+
+                <div className="rounded-2xl border border-slate-100 bg-slate-50/70 px-4 py-4">
+                  <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-400">განყოფილება</p>
+                  <p className="mt-2 text-sm font-semibold text-slate-700">{doctor.department}</p>
                 </div>
+
+                {doctor.comment && (
+                  <div className="rounded-2xl border border-blue-100 bg-blue-50/70 px-4 py-4">
+                    <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-blue-500">კომენტარი</p>
+                    <p className="mt-2 text-sm font-medium leading-relaxed text-slate-700">{doctor.comment}</p>
+                  </div>
+                )}
               </div>
 
               <div className="flex items-center gap-3">
-                <button className="flex-1 bg-white text-slate-900 border border-slate-200 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-slate-50 transition-all flex items-center justify-center gap-2">
-                  <User className="w-4 h-4" />
-                  პროფილი
-                </button>
-                <button className="flex-1 bg-slate-900 text-white py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-blue-600 transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-900/10">
-                  დაკავშირება
-                  <ChevronRight className="w-4 h-4" />
+                <a
+                  href={`tel:${sanitizePhone(doctor.phone)}`}
+                  className="flex-1 bg-blue-600 text-white py-4 rounded-2xl text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-blue-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20"
+                >
+                  დარეკვა
+                  <Phone className="w-4 h-4" />
+                </a>
+                <button
+                  type="button"
+                  onClick={() => void handleCopyPhone(doctor.id, doctor.phone)}
+                  className="flex-1 bg-slate-50 text-slate-500 border border-slate-100 py-4 rounded-2xl text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-slate-100 hover:text-slate-900 transition-all flex items-center justify-center gap-2 shadow-sm"
+                >
+                  {copiedDoctorId === doctor.id ? 'დაკოპირდა' : 'კოპირება'}
+                  <Copy className="w-4 h-4" />
                 </button>
               </div>
             </div>
-          </motion.div>
+          </motion.article>
         ))}
       </div>
+
+      {filteredDoctors.length === 0 && (
+        <div className="text-center py-32 glass-card rounded-[3rem] border-dashed border-slate-200">
+          <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Search className="w-8 h-8 text-slate-300" />
+          </div>
+          <h3 className="text-xl font-bold text-slate-900 mb-2">ექიმები ვერ მოიძებნა</h3>
+          <p className="text-sm text-slate-400 font-medium uppercase tracking-widest">სცადეთ სხვა საძიებო სიტყვა ან განყოფილება</p>
+        </div>
+      )}
     </div>
   );
 }

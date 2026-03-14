@@ -7,51 +7,43 @@ export interface NewsItem {
   content?: string;
 }
 
-export type ResourceIconName =
-  | 'Phone'
-  | 'Calculator'
-  | 'House'
-  | 'ClipboardPlus'
-  | 'RefreshCw'
-  | 'ShieldCheck'
-  | 'FileText'
-  | 'FlaskConical'
-  | 'Activity'
-  | 'BookOpen'
-  | 'Files';
-
-export interface Doctor {
-  id: string;
-  name: string;
-  surname: string;
-  specialty: string;
-  department: string;
-  position: string;
-  phone: string;
-  internalPhone: string;
-  email: string;
-  image: string;
-  bio: string;
-}
-
 export interface ResourceLink {
   id: string;
   title: string;
   description: string;
   url: string;
-  icon: ResourceIconName;
-  category: 'კომუნიკაცია' | 'კლინიკური პროცესები' | 'კლინიკური სისტემები' | 'ცოდნა და დოკუმენტები';
-  access: 'ვებ' | 'შიდა ქსელი' | 'გარე IP' | 'Google Drive';
-  note?: string;
-  featured?: boolean;
+  icon: string;
+  logo?: string;
+  access?: 'ვებ' | 'შიდა ქსელი' | 'გარე IP' | 'Google Drive';
 }
 
-export interface KnowledgeMaterial {
+export interface DirectoryDoctor {
+  id: string;
+  fullName: string;
+  specialty: string;
+  department: string;
+  phone: string;
+  comment: string;
+  sourceKey: string;
+  isInitial: boolean;
+  searchText: string;
+}
+
+export interface KnowledgeDocument {
   id: string;
   title: string;
-  type: 'გაიდლაინი' | 'პროტოკოლი' | 'ალგორითმი' | 'ვიდეო';
-  specialty: string;
-  date: string;
-  author: string;
-  description: string;
+  url: string;
+  modifiedLabel: string;
+  pathLabel: string;
+  extension: string;
+}
+
+export interface KnowledgeDepartment {
+  id: string;
+  slug: string;
+  title: string;
+  url: string;
+  modifiedLabel: string;
+  documentCount: number;
+  documents: KnowledgeDocument[];
 }

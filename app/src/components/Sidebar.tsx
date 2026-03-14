@@ -1,117 +1,123 @@
+import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import {
-  BookOpen,
-  LayoutDashboard,
-  Link as LinkIcon,
-  LogOut,
-  Newspaper,
+import { motion } from 'motion/react';
+import { 
+  LayoutDashboard, 
+  BookOpen, 
+  Users, 
+  Link as LinkIcon, 
+  Newspaper, 
   Stethoscope,
-  Users,
-  X,
+  ChevronRight,
+  LogOut,
+  Bell,
+  Menu,
+  X
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'მთავარი' },
   { to: '/knowledge', icon: BookOpen, label: 'ცოდნის ჰაბი' },
-  { to: '/patient-flow', icon: Stethoscope, label: 'პაციენტთან ბრუნვა' },
   { to: '/doctors', icon: Users, label: 'ექიმების დირექტორია' },
   { to: '/resources', icon: LinkIcon, label: 'რესურსები' },
   { to: '/news', icon: Newspaper, label: 'სიახლეები' },
 ];
 
-type SidebarProps = {
-  isOpen: boolean;
-  onClose: () => void;
-};
+export function Sidebar() {
+  const [isOpen, setIsOpen] = useState(false);
 
-export function Sidebar({ isOpen, onClose }: SidebarProps) {
   return (
-    <aside
-      className={cn(
-        'fixed inset-y-0 left-0 z-50 flex w-[86vw] max-w-72 flex-col border-r border-slate-900 bg-slate-950 text-white transition-transform duration-300 lg:w-72',
-        isOpen ? 'translate-x-0' : '-translate-x-full',
-        'lg:translate-x-0',
+    <>
+      {/* Mobile Toggle Button */}
+      <button 
+        onClick={() => setIsOpen(true)}
+        className="lg:hidden fixed top-6 left-6 z-40 w-12 h-12 bg-white/80 backdrop-blur-xl text-slate-900 rounded-2xl flex items-center justify-center shadow-lg border border-white/20"
+      >
+        <Menu className="w-6 h-6" />
+      </button>
+
+      {/* Mobile Overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 lg:hidden"
+          onClick={() => setIsOpen(false)}
+        />
       )}
-    >
-      <div className="px-5 pb-6 pt-5 lg:px-10 lg:pb-10 lg:pt-10">
-        <div className="mb-10 flex items-center justify-between gap-4 lg:mb-12">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-blue-500/20">
-              <Stethoscope className="text-white w-7 h-7" />
-            </div>
-            <div>
-              <h1 className="font-bold text-xl tracking-tight">INGOROKVA</h1>
-              <p className="text-[10px] text-blue-400 font-bold tracking-[0.3em] uppercase opacity-80">Medical Hub</p>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-800 bg-slate-900 text-slate-400 transition-colors hover:text-white lg:hidden"
-            aria-label="ნავიგაციის დახურვა"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
 
-        <nav className="space-y-2">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              onClick={onClose}
-              className={({ isActive }) =>
-                cn(
-                  'group flex items-center justify-between px-5 py-4 rounded-2xl transition-all duration-300',
-                  isActive
-                    ? 'bg-white text-slate-950 shadow-2xl shadow-white/5'
-                    : 'text-slate-500 hover:text-white hover:bg-slate-900/50',
-                )
-              }
+      <aside className={cn(
+        "fixed inset-y-6 left-6 w-64 glass-card rounded-[2.5rem] text-slate-900 flex flex-col z-[60] transition-transform duration-700 lg:translate-x-0",
+        isOpen ? "translate-x-0" : "-translate-x-[120%]"
+      )}>
+        <div className="p-8">
+          <div className="flex items-center justify-between mb-10">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <Stethoscope className="text-white w-5 h-5" />
+              </div>
+              <div>
+                <h1 className="font-extrabold text-lg tracking-tight leading-none text-slate-900">INGOROKVA</h1>
+                <p className="text-[9px] text-blue-600 font-bold tracking-[0.2em] uppercase opacity-80 mt-1">Medical Hub</p>
+              </div>
+            </div>
+            <button 
+              onClick={() => setIsOpen(false)}
+              className="lg:hidden w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400"
             >
-              {({ isActive }) => (
-                <>
-                  <div className="flex items-center gap-4">
-                    <item.icon
-                      className={cn(
-                        'w-5 h-5 transition-colors',
-                        isActive ? 'text-blue-600' : 'text-slate-600 group-hover:text-blue-400',
-                      )}
-                    />
-                    <span className="text-sm font-bold tracking-tight">{item.label}</span>
-                  </div>
-                  {isActive && <div className="w-1.5 h-1.5 rounded-full bg-blue-600" />}
-                </>
-              )}
-            </NavLink>
-          ))}
-        </nav>
-      </div>
+              <X className="w-4 h-4" />
+            </button>
+          </div>
 
-      <div className="mt-auto px-5 pb-5 lg:px-10 lg:pb-10 space-y-6">
-        <div className="p-6 bg-slate-900/50 rounded-[2rem] border border-slate-900 backdrop-blur-sm">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-10 h-10 rounded-2xl bg-slate-800 flex items-center justify-center text-xs font-bold border border-slate-700">GA</div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-bold truncate">გიორგი აბაშიძე</p>
-              <p className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">კარდიოლოგი</p>
+          <nav className="space-y-1">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                onClick={() => setIsOpen(false)}
+                className={({ isActive }) => cn(
+                   "group flex items-center gap-4 px-5 py-3.5 rounded-xl transition-all duration-500",
+                   isActive 
+                     ? "bg-blue-50 text-blue-600 shadow-sm" 
+                     : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
+                )}
+              >
+                {({ isActive }) => (
+                  <>
+                    <item.icon className={cn("w-5 h-5 transition-all duration-500", isActive ? "text-blue-600 scale-110" : "text-slate-400 group-hover:text-slate-600")} />
+                    <span className="text-sm font-semibold tracking-tight">{item.label}</span>
+                    {isActive && (
+                      <motion.div 
+                        layoutId="active-pill"
+                        className="ml-auto w-1 h-4 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" 
+                      />
+                    )}
+                  </>
+                )}
+              </NavLink>
+            ))}
+          </nav>
+        </div>
+
+        <div className="mt-auto p-8 space-y-6">
+          <div className="p-5 bg-slate-50/50 rounded-3xl border border-slate-100">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center text-[10px] font-bold border border-slate-200 text-slate-600 shadow-sm">GA</div>
+            </div>
+            <button className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-white text-[10px] font-bold text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-all border border-slate-100 shadow-sm">
+              <LogOut className="w-3 h-3" />
+              გასვლა
+            </button>
+          </div>
+          
+          <div className="flex items-center justify-between px-2">
+            <p className="text-[9px] text-slate-400 font-mono uppercase tracking-[0.1em]">v2.4.0-stable</p>
+            <div className="flex items-center gap-2">
+               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+               <span className="text-[9px] text-slate-500 uppercase font-bold tracking-widest">Online</span>
             </div>
           </div>
-          <button className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-slate-900 text-[10px] font-bold text-slate-500 hover:text-rose-400 hover:bg-rose-500/5 transition-all border border-transparent hover:border-rose-500/20">
-            <LogOut className="w-3 h-3" />
-            გასვლა
-          </button>
         </div>
-        
-        <div className="flex items-center justify-between px-2">
-          <p className="text-[10px] text-slate-700 font-mono uppercase tracking-[0.2em]">v2.4.0-stable</p>
-          <div className="flex items-center gap-2">
-             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-             <span className="text-[10px] text-slate-600 uppercase font-bold tracking-widest">Online</span>
-          </div>
-        </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 }
