@@ -43,7 +43,7 @@ export function DoctorsDirectory() {
 
   return (
     <div className="space-y-12">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-8">
         <div>
           <div className="flex items-center gap-4 mb-4">
             <div className="h-8 w-1.5 bg-gradient-to-b from-blue-500 to-indigo-600 rounded-full shadow-[0_0_15px_rgba(59,130,246,0.2)]" />

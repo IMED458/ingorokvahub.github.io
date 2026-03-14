@@ -112,15 +112,15 @@ export default function App() {
 
   return (
     <HashRouter>
-      <div className="min-h-screen flex bg-[#F8FAFC] font-sans text-slate-900 selection:bg-blue-100 selection:text-blue-900 relative overflow-hidden">
+      <div className="min-h-screen flex bg-[#F8FAFC] font-sans text-slate-900 selection:bg-blue-100 selection:text-blue-900 relative overflow-x-hidden">
         {/* Background Mesh Gradients */}
         <div className="fixed inset-0 bg-mesh pointer-events-none" />
         
         <Sidebar />
         
-        <main className="flex-1 lg:ml-80 min-h-screen relative">
-          <div className="relative z-10 p-4 sm:p-12 max-w-7xl mx-auto">
-            <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8 sm:mb-12 pt-16 lg:pt-0">
+        <main className="w-full min-w-0 min-h-screen relative lg:pl-[19rem]">
+          <div className="relative z-10 w-full max-w-[1600px] mx-auto px-4 sm:px-8 xl:px-12 py-4 sm:py-12">
+            <header className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 mb-8 sm:mb-12 pt-16 lg:pt-0 min-w-0">
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-2 h-2 rounded-full bg-blue-600 shadow-[0_0_10px_rgba(59,130,246,0.2)] animate-pulse" />
@@ -128,7 +128,7 @@ export default function App() {
                 </div>
                 <h2 className="text-xs font-mono text-slate-400">Node: <span className="text-slate-900 font-bold">TBS-01</span> / Status: <span className="text-emerald-600 font-bold">Operational</span></h2>
               </div>
-              <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-6 flex-wrap">
+              <div className="flex items-center justify-between xl:justify-end gap-4 sm:gap-6 flex-wrap min-w-0">
                 {role === 'admin' && (
                   <button
                     onClick={() => setIsAddNewsOpen(true)}
