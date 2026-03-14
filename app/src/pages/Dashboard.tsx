@@ -179,13 +179,13 @@ export function Dashboard({ news, onOpenNews }: DashboardProps) {
               <div className="space-y-4 sm:space-y-6">
                 {corporateNumbers.map((item, index) => (
                   <div key={item.department}>
-                    <div className="grid grid-cols-[minmax(0,1fr)_9.5rem] sm:grid-cols-[minmax(0,1fr)_11rem] items-center gap-x-6 group">
-                      <span className="text-[11px] sm:text-xs text-slate-400 font-semibold group-hover:text-slate-600 transition-colors whitespace-nowrap">
+                    <div className="grid grid-cols-[minmax(0,1fr)_8.75rem] sm:grid-cols-[minmax(0,1fr)_9.5rem] items-center gap-x-4 sm:gap-x-5 group">
+                      <span className="min-w-0 text-[10px] sm:text-[11px] text-slate-400 font-semibold group-hover:text-slate-600 transition-colors leading-relaxed">
                         {item.department}
                       </span>
                       <a
                         href={`tel:${sanitizePhone(item.phone)}`}
-                        className="font-mono text-lg sm:text-xl font-black text-slate-900 whitespace-nowrap text-right tabular-nums"
+                        className="font-mono text-base sm:text-lg font-black text-slate-900 whitespace-nowrap text-right tabular-nums tracking-tight"
                       >
                         {item.phone}
                       </a>
