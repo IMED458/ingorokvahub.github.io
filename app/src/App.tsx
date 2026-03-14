@@ -1,11 +1,25 @@
 import React from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
+import { collection, deleteDoc, doc, onSnapshot, setDoc } from 'firebase/firestore';
 import { Bell, Plus } from 'lucide-react';
 import { AddNewsModal } from './components/AddNewsModal';
 import { NewsDetailModal } from './components/NewsDetailModal';
+import { NotificationsModal } from './components/NotificationsModal';
 import { Sidebar } from './components/Sidebar';
 import { useAuth } from './context/AuthContext';
 import { NEWS } from './constants';
+import { firestore, enableFirebaseAnalytics } from './lib/firebase';
+import {
+  getInitialNewsState,
+  getLatestNewsTimestamp,
+  getNewsTimestamp,
+  NEWS_LAST_SEEN_STORAGE_KEY,
+  normalizeNewsItem,
+  readStoredNumber,
+  sortNews,
+  writeStoredNews,
+  writeStoredNumber,
+} from './lib/news';
 import { Dashboard } from './pages/Dashboard';
 import { KnowledgeHub } from './pages/KnowledgeHub';
 import { DoctorsDirectory } from './pages/DoctorsDirectory';
@@ -15,85 +29,99 @@ import { LoginPage } from './pages/LoginPage';
 import { Resources } from './pages/Resources';
 import type { NewsItem } from './types';
 
-const NEWS_STORAGE_KEY = 'medhub_news_state_v2';
-const LEGACY_CUSTOM_NEWS_STORAGE_KEY = 'medhub_news';
+const NEWS_COLLECTION = 'news';
 
-function isNewsItem(value: unknown): value is NewsItem {
-  if (!value || typeof value !== 'object') {
-    return false;
+function upsertNewsLocally(current: NewsItem[], item: NewsItem) {
+  const exists = current.some((entry) => entry.id === item.id);
+  if (exists) {
+    return sortNews(current.map((entry) => (entry.id === item.id ? item : entry)));
   }
 
-  const item = value as Record<string, unknown>;
-  return (
-    typeof item.id === 'string' &&
-    typeof item.title === 'string' &&
-    typeof item.date === 'string' &&
-    typeof item.category === 'string' &&
-    typeof item.summary === 'string'
-  );
-}
-
-function readStoredNews(storageKey: string): NewsItem[] | null {
-  if (typeof window === 'undefined') {
-    return null;
-  }
-
-  try {
-    const saved = window.localStorage.getItem(storageKey);
-    if (!saved) {
-      return null;
-    }
-
-    const parsed = JSON.parse(saved);
-    if (!Array.isArray(parsed)) {
-      return null;
-    }
-
-    return parsed.filter(isNewsItem);
-  } catch {
-    return null;
-  }
-}
-
-function getNewsTimestamp(item: NewsItem) {
-  if (typeof item.createdAt === 'number') {
-    return item.createdAt;
-  }
-
-  const parsed = Date.parse(item.date);
-  return Number.isNaN(parsed) ? 0 : parsed;
-}
-
-function sortNews(items: NewsItem[]) {
-  return [...items].sort((left, right) => getNewsTimestamp(right) - getNewsTimestamp(left));
-}
-
-function getInitialNewsState() {
-  const storedNews = readStoredNews(NEWS_STORAGE_KEY);
-  if (storedNews !== null) {
-    return sortNews(storedNews);
-  }
-
-  const legacyCustomNews = readStoredNews(LEGACY_CUSTOM_NEWS_STORAGE_KEY) ?? [];
-  return sortNews([...NEWS, ...legacyCustomNews]);
+  return sortNews([item, ...current]);
 }
 
 export default function App() {
   const { isAuthenticated, role } = useAuth();
+  const initialNews = React.useMemo(() => getInitialNewsState(NEWS), []);
+  const initialNewsRef = React.useRef(initialNews);
+  const hasMigratedInitialNewsRef = React.useRef(false);
   const [now, setNow] = React.useState(() => new Date());
   const [isNewsModalOpen, setIsNewsModalOpen] = React.useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = React.useState(false);
   const [editingNews, setEditingNews] = React.useState<NewsItem | null>(null);
-  const [news, setNews] = React.useState<NewsItem[]>(getInitialNewsState);
+  const [news, setNews] = React.useState<NewsItem[]>(initialNews);
+  const [lastSeenNewsAt, setLastSeenNewsAt] = React.useState<number | null>(() =>
+    readStoredNumber(NEWS_LAST_SEEN_STORAGE_KEY),
+  );
   const [selectedNews, setSelectedNews] = React.useState<NewsItem | null>(null);
 
   React.useEffect(() => {
-    window.localStorage.setItem(NEWS_STORAGE_KEY, JSON.stringify(news));
-    window.localStorage.removeItem(LEGACY_CUSTOM_NEWS_STORAGE_KEY);
+    writeStoredNews(news);
   }, [news]);
+
+  React.useEffect(() => {
+    if (lastSeenNewsAt === null) {
+      return;
+    }
+
+    writeStoredNumber(NEWS_LAST_SEEN_STORAGE_KEY, lastSeenNewsAt);
+  }, [lastSeenNewsAt]);
+
+  React.useEffect(() => {
+    void enableFirebaseAnalytics();
+  }, []);
 
   React.useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 1000);
     return () => window.clearInterval(timer);
+  }, []);
+
+  React.useEffect(() => {
+    const newsCollectionRef = collection(firestore, NEWS_COLLECTION);
+
+    const unsubscribe = onSnapshot(
+      newsCollectionRef,
+      (snapshot) => {
+        const remoteNews = sortNews(
+          snapshot.docs.map((snapshotDoc) =>
+            normalizeNewsItem({
+              id: snapshotDoc.id,
+              ...(snapshotDoc.data() as Omit<NewsItem, 'id'>),
+            }),
+          ),
+        );
+
+        if (!hasMigratedInitialNewsRef.current) {
+          hasMigratedInitialNewsRef.current = true;
+
+          const remoteIds = new Set(remoteNews.map((item) => item.id));
+          const missingLocalNews = initialNewsRef.current
+            .map(normalizeNewsItem)
+            .filter((item) => !remoteIds.has(item.id));
+
+          if (missingLocalNews.length > 0) {
+            void Promise.all(
+              missingLocalNews.map((item) => setDoc(doc(newsCollectionRef, item.id), item)),
+            ).catch((error) => {
+              console.error('Failed to migrate local news to Firebase.', error);
+            });
+
+            if (remoteNews.length === 0) {
+              setNews(sortNews(missingLocalNews));
+              return;
+            }
+          }
+        }
+
+        setNews(remoteNews.length > 0 ? remoteNews : initialNewsRef.current);
+      },
+      (error) => {
+        console.error('Failed to subscribe to Firebase news.', error);
+        setNews(getInitialNewsState(NEWS));
+      },
+    );
+
+    return () => unsubscribe();
   }, []);
 
   React.useEffect(() => {
@@ -106,8 +134,17 @@ export default function App() {
   React.useEffect(() => {
     if (!isAuthenticated) {
       setSelectedNews(null);
+      setIsNotificationsOpen(false);
     }
   }, [isAuthenticated]);
+
+  React.useEffect(() => {
+    if (lastSeenNewsAt !== null || news.length === 0) {
+      return;
+    }
+
+    setLastSeenNewsAt(getLatestNewsTimestamp(news));
+  }, [lastSeenNewsAt, news]);
 
   React.useEffect(() => {
     if (!selectedNews) {
@@ -125,18 +162,26 @@ export default function App() {
     }
   }, [news, selectedNews]);
 
-  const handleSaveNews = React.useCallback((item: NewsItem) => {
-    setNews((current) => {
-      const exists = current.some((entry) => entry.id === item.id);
-      if (exists) {
-        return sortNews(current.map((entry) => (entry.id === item.id ? item : entry)));
-      }
+  const unreadCount = React.useMemo(() => {
+    if (lastSeenNewsAt === null) {
+      return 0;
+    }
 
-      return sortNews([item, ...current]);
-    });
+    return news.filter((item) => getNewsTimestamp(item) > lastSeenNewsAt).length;
+  }, [lastSeenNewsAt, news]);
 
-    setIsNewsModalOpen(false);
-    setEditingNews(null);
+  const handleSaveNews = React.useCallback(async (item: NewsItem) => {
+    const normalizedItem = normalizeNewsItem(item);
+
+    try {
+      await setDoc(doc(firestore, NEWS_COLLECTION, normalizedItem.id), normalizedItem);
+    } catch (error) {
+      console.error('Failed to save news in Firebase.', error);
+      setNews((current) => upsertNewsLocally(current, normalizedItem));
+    } finally {
+      setIsNewsModalOpen(false);
+      setEditingNews(null);
+    }
   }, []);
 
   const openCreateNews = React.useCallback(() => {
@@ -150,16 +195,32 @@ export default function App() {
     setIsNewsModalOpen(true);
   }, []);
 
-  const handleDeleteNews = React.useCallback((item: NewsItem) => {
+  const handleDeleteNews = React.useCallback(async (item: NewsItem) => {
     const shouldDelete = window.confirm(`ნამდვილად გსურთ სიახლის წაშლა: "${item.title}"?`);
     if (!shouldDelete) {
       return;
     }
 
-    setNews((current) => current.filter((entry) => entry.id !== item.id));
-    setSelectedNews((current) => (current?.id === item.id ? null : current));
-    setEditingNews((current) => (current?.id === item.id ? null : current));
-    setIsNewsModalOpen(false);
+    try {
+      await deleteDoc(doc(firestore, NEWS_COLLECTION, item.id));
+    } catch (error) {
+      console.error('Failed to delete news in Firebase.', error);
+      setNews((current) => current.filter((entry) => entry.id !== item.id));
+    } finally {
+      setSelectedNews((current) => (current?.id === item.id ? null : current));
+      setEditingNews((current) => (current?.id === item.id ? null : current));
+      setIsNewsModalOpen(false);
+    }
+  }, []);
+
+  const openNotifications = React.useCallback(() => {
+    setLastSeenNewsAt(Math.max(Date.now(), getLatestNewsTimestamp(news)));
+    setIsNotificationsOpen(true);
+  }, [news]);
+
+  const handleOpenNewsFromNotifications = React.useCallback((item: NewsItem) => {
+    setIsNotificationsOpen(false);
+    setSelectedNews(item);
   }, []);
 
   const currentDate = now.toLocaleDateString('ka-GE', {
@@ -182,11 +243,10 @@ export default function App() {
   return (
     <HashRouter>
       <div className="min-h-screen flex bg-[#F8FAFC] font-sans text-slate-900 selection:bg-blue-100 selection:text-blue-900 relative overflow-x-hidden">
-        {/* Background Mesh Gradients */}
         <div className="fixed inset-0 bg-mesh pointer-events-none" />
-        
+
         <Sidebar />
-        
+
         <main className="w-full min-w-0 min-h-screen relative lg:pl-[19rem]">
           <div className="relative z-10 w-full max-w-[1600px] mx-auto px-4 sm:px-8 xl:px-12 py-4 sm:py-12">
             <header className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 mb-8 sm:mb-12 pt-16 lg:pt-0 min-w-0">
@@ -195,7 +255,10 @@ export default function App() {
                   <div className="w-2 h-2 rounded-full bg-blue-600 shadow-[0_0_10px_rgba(59,130,246,0.2)] animate-pulse" />
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.4em]">Secure Network</p>
                 </div>
-                <h2 className="text-xs font-mono text-slate-400">Node: <span className="text-slate-900 font-bold">TBS-01</span> / Status: <span className="text-emerald-600 font-bold">Operational</span></h2>
+                <h2 className="text-xs font-mono text-slate-400">
+                  Node: <span className="text-slate-900 font-bold">TBS-01</span> / Status:{' '}
+                  <span className="text-emerald-600 font-bold">Operational</span>
+                </h2>
               </div>
               <div className="flex items-center justify-between xl:justify-end gap-4 sm:gap-6 flex-wrap min-w-0">
                 {role === 'admin' && (
@@ -209,21 +272,29 @@ export default function App() {
                 )}
                 <div className="text-left sm:text-right">
                   <p className="text-xs font-bold text-slate-900">{currentDate}</p>
-                  <p className="text-[10px] text-slate-400 font-mono tracking-tighter uppercase">{currentTime} Tbilisi</p>
+                  <p className="text-[10px] text-slate-400 font-mono tracking-tighter uppercase">
+                    {currentTime} Tbilisi
+                  </p>
                 </div>
                 <div className="h-8 w-[1px] bg-slate-200" />
-                <button className="p-3 glass-card rounded-2xl text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all relative group">
-                  <div className="absolute top-3 right-3 w-2 h-2 bg-rose-500 rounded-full border-2 border-white group-hover:scale-125 transition-transform" />
+                <button
+                  type="button"
+                  onClick={openNotifications}
+                  className="p-3 glass-card rounded-2xl text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all relative group"
+                  aria-label="Open news notifications"
+                >
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center border-2 border-white shadow-sm">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
                   <Bell className="w-5 h-5" />
                 </button>
               </div>
             </header>
 
             <Routes>
-              <Route
-                path="/"
-                element={<Dashboard news={news} onOpenNews={setSelectedNews} />}
-              />
+              <Route path="/" element={<Dashboard news={news} onOpenNews={setSelectedNews} />} />
               <Route path="/knowledge" element={<KnowledgeHub />} />
               <Route path="/patient-flow" element={<PatientFlow />} />
               <Route path="/doctors" element={<DoctorsDirectory />} />
@@ -261,6 +332,15 @@ export default function App() {
           canManage={role === 'admin'}
           onEdit={openEditNews}
           onDelete={handleDeleteNews}
+        />
+
+        <NotificationsModal
+          isOpen={isNotificationsOpen}
+          news={news}
+          unreadCount={unreadCount}
+          lastSeenAt={lastSeenNewsAt}
+          onClose={() => setIsNotificationsOpen(false)}
+          onOpenNews={handleOpenNewsFromNotifications}
         />
       </div>
     </HashRouter>

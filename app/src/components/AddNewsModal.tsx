@@ -6,7 +6,7 @@ import type { NewsItem } from '../types';
 interface AddNewsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (news: NewsItem) => void;
+  onSave: (news: NewsItem) => Promise<void> | void;
   initialNews?: NewsItem | null;
 }
 
@@ -23,6 +23,7 @@ export function AddNewsModal({ isOpen, onClose, onSave, initialNews = null }: Ad
   const [summary, setSummary] = React.useState('');
   const [content, setContent] = React.useState('');
   const [category, setCategory] = React.useState<NewsItem['category']>('ტრენინგი');
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   React.useEffect(() => {
     if (!isOpen) {
@@ -30,6 +31,7 @@ export function AddNewsModal({ isOpen, onClose, onSave, initialNews = null }: Ad
       setSummary('');
       setContent('');
       setCategory('ტრენინგი');
+      setIsSubmitting(false);
       return;
     }
 
@@ -43,8 +45,9 @@ export function AddNewsModal({ isOpen, onClose, onSave, initialNews = null }: Ad
     return null;
   }
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setIsSubmitting(true);
 
     const createdAt = Date.now();
     const nextItem: NewsItem = {
@@ -62,7 +65,11 @@ export function AddNewsModal({ isOpen, onClose, onSave, initialNews = null }: Ad
       nextItem.createdAt = createdAt;
     }
 
-    onSave(nextItem);
+    try {
+      await onSave(nextItem);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -145,10 +152,11 @@ export function AddNewsModal({ isOpen, onClose, onSave, initialNews = null }: Ad
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-5 rounded-2xl font-bold uppercase text-xs flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-colors"
+            disabled={isSubmitting}
+            className="w-full bg-blue-600 text-white py-5 rounded-2xl font-bold uppercase text-xs flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {initialNews ? <Pencil className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-            {initialNews ? 'შენახვა' : 'დამატება'}
+            {isSubmitting ? 'ინახება...' : initialNews ? 'შენახვა' : 'დამატება'}
           </button>
         </form>
       </motion.div>
