@@ -130,7 +130,7 @@ export const RESOURCES: ResourceLink[] = [
     title: 'საექთნო დოკუმენტები',
     description: 'საექთნო დოკუმენტების პლატფორმა',
     url: 'https://imed458.github.io/nurse.github.io/',
-    icon: 'Files',
+    icon: 'BriefcaseMedical',
     access: 'ვებ',
   }
 ];

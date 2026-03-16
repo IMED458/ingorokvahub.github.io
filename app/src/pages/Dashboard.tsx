@@ -14,6 +14,7 @@ import {
   Activity,
   ShieldCheck,
   Calculator,
+  BriefcaseMedical,
   Home,
   FileText,
   RefreshCw,
@@ -61,7 +62,8 @@ const iconMap: Record<string, any> = {
   Beaker,
   Activity,
   BookOpen,
-  Files
+  Files,
+  BriefcaseMedical
 };
 
 interface DashboardProps {
