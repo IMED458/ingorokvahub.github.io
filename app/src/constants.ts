@@ -124,5 +124,13 @@ export const RESOURCES: ResourceLink[] = [
     url: 'https://www.ingorokvaclinic.org/services-7',
     icon: 'Files',
     access: 'ვებ',
+  },
+  {
+    id: '13',
+    title: 'საექთნო დოკუმენტები',
+    description: 'საექთნო დოკუმენტების პლატფორმა',
+    url: 'https://imed458.github.io/nurse.github.io/',
+    icon: 'Files',
+    access: 'ვებ',
   }
 ];
