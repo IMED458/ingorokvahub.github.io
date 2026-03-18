@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>პაციენტის პირველადი საექთნო ABCDFWC შეფასება</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', 'Noto Sans Georgian', Arial, sans-serif;
+    font-size: 11.5px;
+    background: #fff;
+    color: #000;
+    padding: 16px;
+  }
+
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  td, th {
+    border: 1px solid #000;
+    padding: 4px 6px;
+    vertical-align: middle;
+    font-size: 11.5px;
+  }
+
+  .title-row td {
+    text-align: center;
+    font-weight: bold;
+    font-size: 13px;
+    padding: 8px;
+    background: #fff;
+  }
+
+  .section-label {
+    font-weight: bold;
+    font-size: 11.5px;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    text-align: center;
+    white-space: nowrap;
+    padding: 6px 4px;
+    width: 28px;
+    min-width: 28px;
+  }
+
+  .right-header-cell {
+    background: #d9d9d9;
+    font-weight: bold;
+    font-size: 12px;
+    text-align: center;
+  }
+
+  input[type="text"],
+  input[type="date"],
+  input[type="number"],
+  input[type="time"] {
+    border: none;
+    border-bottom: 1px solid #555;
+    outline: none;
+    font-size: 11.5px;
+    font-family: inherit;
+    background: transparent;
+    width: 100%;
+    padding: 1px 2px;
+  }
+
+  .cr {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px 10px;
+    align-items: center;
+    line-height: 1.9;
+  }
+
+  .cr label {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .cr input[type="checkbox"],
+  .cr input[type="radio"] {
+    width: 12px;
+    height: 12px;
+    cursor: pointer;
+    accent-color: #000;
+    flex-shrink: 0;
+  }
+
+  .ii {
+    display: inline-block;
+    border: none;
+    border-bottom: 1px solid #555;
+    outline: none;
+    font-size: 11.5px;
+    font-family: inherit;
+    background: transparent;
+    padding: 0 2px;
+  }
+
+  .vitals-header td {
+    text-align: center;
+    font-weight: bold;
+    background: #f2f2f2;
+    font-size: 11px;
+    padding: 3px 4px;
+  }
+
+  .vitals-input td {
+    padding: 4px 4px;
+    text-align: center;
+  }
+
+  .vitals-input input {
+    text-align: center;
+  }
+
+  .print-btn {
+    display: block;
+    margin: 14px auto 0;
+    padding: 7px 26px;
+    font-size: 13px;
+    cursor: pointer;
+    background: #1a5fa8;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+  }
+
+  @media print {
+    body { padding: 0; }
+    .print-btn { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<table>
+  <tr class="title-row">
+    <td colspan="10">პაციენტის პირველადი საექთნო ABCDFWC შეფასება გადაუდებელი დახმარების დეპარტამენტში</td>
+  </tr>
+
+  <tr>
+    <td colspan="3" style="font-weight:bold;">პაციენტი: <input type="text" style="width:70%;"></td>
+    <td colspan="1" style="font-weight:bold;">ასაკი: <input type="text" style="width:60%;"></td>
+    <td colspan="2" style="font-weight:bold;">სქესი:&nbsp;
+      <label style="cursor:pointer;"><input type="radio" name="sex" style="cursor:pointer;"> მამრ</label>&nbsp;&nbsp;
+      <label style="cursor:pointer;"><input type="radio" name="sex" style="cursor:pointer;"> მდედრ</label>
+    </td>
+    <td colspan="4" style="font-weight:bold;">შემფასებელი ექთანი: <input type="text" style="width:55%;"></td>
+  </tr>
+
+  <tr>
+    <td colspan="2" style="font-weight:bold;">შემოსვლის თარიღი: <input type="date" id="entry-date" style="width:auto;"></td>
+    <td style="font-weight:bold;">დრო: <input type="time" style="width:auto;"></td>
+    <td colspan="5" style="font-weight:bold;">შემოსვლის გზა:&nbsp;
+      <label style="cursor:pointer;"><input type="radio" name="entry" style="cursor:pointer;"> სდბ</label>&nbsp;
+      <label style="cursor:pointer;"><input type="radio" name="entry" style="cursor:pointer;"> თვითდინება</label>&nbsp;
+      <label style="cursor:pointer;"><input type="radio" name="entry" style="cursor:pointer;"> ამბულატორია</label>&nbsp;
+      <label style="cursor:pointer;"><input type="radio" name="entry" style="cursor:pointer;"> რეფერალი</label>
+    </td>
+    <td colspan="2"></td>
+  </tr>
+
+  <tr>
+    <td colspan="10" style="background:#d9d9d9;font-weight:bold;font-size:12px;padding:4px 6px;">სასიცოცხლო ნიშნები და ანთროპომეტრიული მონაცემები</td>
+  </tr>
+  <tr>
+    <td colspan="5" style="font-weight:bold;">შეფასების თარიღი და დრო: <input type="text" style="width:50%;"></td>
+    <td colspan="5" style="font-style:italic;color:#555;font-size:10.5px;">კომენტარი: <input type="text" style="width:70%;"></td>
+  </tr>
+
+  <tr class="vitals-header">
+    <td>ტემპ. °C</td>
+    <td>პულსი</td>
+    <td>სუნთქვა</td>
+    <td>წნევა</td>
+    <td>სატურაცია</td>
+    <td>გლუკოზა</td>
+    <td colspan="2">სიმაღლე</td>
+    <td colspan="2">წონა</td>
+  </tr>
+  <tr class="vitals-input">
+    <td><input type="text"></td>
+    <td><input type="text"></td>
+    <td><input type="text"></td>
+    <td><input type="text"></td>
+    <td><input type="text"></td>
+    <td><input type="text"></td>
+    <td colspan="2"><input type="text"></td>
+    <td colspan="2"><input type="text"></td>
+  </tr>
+
+  <tr>
+    <td rowspan="5" class="section-label" style="background:#f2f2f2;">სასუნთქი გზები AIRWAYS</td>
+    <td colspan="5">
+      <div class="cr">
+        <label><input type="checkbox"> თავისუფალი/გამტარი</label>
+        <label><input type="checkbox"> ინჰალაციური დაზიანება</label>
+        <label><input type="checkbox"> ნაწილობრივ გამტარი</label>
+        <label><input type="checkbox"> ჭარბი სეკრეტი/ნერწყვდენა</label>
+        <label><input type="checkbox"> ენდოტრაქეული მილი</label>
+        <label><input type="checkbox"> ობსტრუქციის რისკი</label>
+        <label><input type="checkbox"> ხმაურიანი სუნთქვა</label>
+      </div>
+    </td>
+    <td colspan="4" class="right-header-cell">გადაუდებელი საექთნო დახმარება</td>
+  </tr>
+  <tr>
+    <td colspan="5"></td>
+    <td colspan="4"><div class="cr"><label><input type="checkbox"> სასუნთქი გზების მანუალური გათავისუფლება გამტარია</label></div></td>
+  </tr>
+  <tr>
+    <td colspan="5"></td>
+    <td colspan="4"><div class="cr"><label><input type="checkbox"> სეკრეტის ასპირაცია</label></div></td>
+  </tr>
+  <tr>
+    <td colspan="5"></td>
+    <td colspan="4"><div class="cr"><label><input type="checkbox"> სასუნთქი გზების გამავლობის მექანიკური აღდგენა</label></div></td>
+  </tr>
+  <tr>
+    <td colspan="5"></td>
+    <td colspan="4"></td>
+  </tr>
+
+  <tr>
+    <td rowspan="7" class="section-label" style="background:#f2f2f2;">სუნთქვა BREATHING</td>
+    <td colspan="5">
+      <div class="cr">
+        <label><input type="checkbox"> არარეგულარული</label>
+        <label><input type="checkbox"> ძალდატანებითი/ორთოპნოე</label>
+        <label><input type="checkbox"> ზედაპირული</label>
+        <label><input type="checkbox"> მშრალი ხველა</label>
+        <label><input type="checkbox"> ღრმა</label>
+        <label><input type="checkbox"> ჩირქოვანი ნახველი</label>
+        <label><input type="checkbox"> აპნოე</label>
+        <label><input type="checkbox"> სისხლიანი ნახველი</label>
+      </div>
+    </td>
+    <td colspan="4"><div class="cr"><label><input type="checkbox"> ოქსიგენოთერაპია</label><input class="ii" type="text" style="width:50px;" placeholder="______"> ლ/წთ სიჩქარით</div></td>
+  </tr>
+  <tr>
+    <td colspan="5"></td>
+    <td colspan="4"><div class="cr"><label><input type="checkbox"> არტერიული აირების ანალიზი</label></div></td>
+  </tr>
+  <tr>
+    <td colspan="5"></td>
+    <td colspan="4"><div class="cr"><label><input type="checkbox"> ნებულაიზერით ინჰალაცია</label></div></td>
+  </tr>
+  <tr>
+    <td colspan="5"></td>
+    <td colspan="4"><div class="cr"><label><input type="checkbox"> არაინვაზიური ვენტილაციის დაწყება</label></div></td>
+  </tr>
+  <tr>
+    <td colspan="5"></td>
+    <td colspan="4"></td>
+  </tr>
+  <tr>
+    <td colspan="5"></td>
+    <td colspan="4"></td>
+  </tr>
+  <tr>
+    <td colspan="5"></td>
+    <td colspan="4"></td>
+  </tr>
+
+  <tr>
+    <td rowspan="6" class="section-label" style="background:#f2f2f2;">ცირკულაცია CIRCULATION</td>
+    <td colspan="5">
+      <div class="cr">
+        <label><input type="checkbox"> დაჭიმული პულსი</label>
+        <label><input type="checkbox"> არეგულარული</label>
+        <label><input type="checkbox"> სუსტი ავსების პულსი</label>
+        <label><input type="checkbox"> საუღლე ვენების შებერვა</label>
+        <label><input type="checkbox"> პულსი არ ისიჯება</label>
+        <label><input type="checkbox"> გენერალიზებული შეშუპება</label>
+        <label><input type="checkbox"> რეგულარული</label>
+        <label><input type="checkbox"> ლოკალური შეშუპება</label>
+        <label><input type="checkbox"> მხედველობის დარღვევა</label>
+        <label><input type="checkbox"> სმენის დარღვევა</label>
+        <label><input type="checkbox"> მეტყველების დარღვევა</label>
+        <label><input type="checkbox"> კიდურების სისუსტე</label>
+        <label><input type="checkbox"> სახის ასიმეტრია</label>
+      </div>
+    </td>
+    <td colspan="4"><div class="cr"><label><input type="checkbox"> მონიტორინგი</label></div></td>
+  </tr>
+  <tr>
+    <td colspan="5"></td>
+    <td colspan="4"><div class="cr"><label><input type="checkbox"> ეკგ გადაღება</label></div></td>
+  </tr>
+  <tr>
+    <td colspan="5"></td>
+    <td colspan="4"><div class="cr"><label><input type="checkbox"> ივ კანულა</label></div></td>
+  </tr>
+  <tr>
+    <td colspan="5"></td>
+    <td colspan="4"><div class="cr"><label><input type="checkbox"> სხვა</label><input class="ii" type="text" style="width:120px;"></div></td>
+  </tr>
+  <tr>
+    <td colspan="5"></td>
+    <td colspan="4" style="border-top:2px solid #555;font-size:10px;color:#555;padding:2px 6px;">─────────────────────────────────────────────────────</td>
+  </tr>
+  <tr>
+    <td colspan="5"></td>
+    <td colspan="4"></td>
+  </tr>
+
+  <tr>
+    <td rowspan="5" class="section-label" style="background:#f2f2f2;">უუნარობა DISABILITY</td>
+    <td colspan="4" style="vertical-align:top;">
+      <div style="font-weight:bold;margin-bottom:4px;">Glasgow Coma Scale:</div>
+      <div style="margin-bottom:2px;">თვალის გახელა &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input class="ii" type="text" style="width:35px;" placeholder="____"> ქულა</div>
+      <div style="margin-bottom:2px;">მოტორული პასუხი &nbsp; <input class="ii" type="text" style="width:35px;" placeholder="____"> ქულა</div>
+      <div style="margin-bottom:2px;">ვერბალური პასუხი &nbsp;&nbsp; <input class="ii" type="text" style="width:35px;" placeholder="____"> ქულა</div>
+      <div>ჯამი &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <input class="ii" type="text" style="width:60px;" placeholder="__________"> ქულა</div>
+    </td>
+    <td colspan="1"></td>
+    <td colspan="4"><div class="cr"><label><input type="checkbox"> პაციენტის შესაბამისი პოზიციონირება</label></div></td>
+  </tr>
+  <tr>
+    <td colspan="5"></td>
+    <td colspan="4"><div class="cr"><label><input type="checkbox"> ჰიპოგლიკემიის კორექცია</label></div></td>
+  </tr>
+  <tr>
+    <td colspan="5"></td>
+    <td colspan="4"><div class="cr"><label><input type="checkbox"> რადიოლოგიური კვლევისთვის მომზადება</label></div></td>
+  </tr>
+  <tr>
+    <td colspan="5"></td>
+    <td colspan="4"><div class="cr">სხვა<input class="ii" type="text" style="width:160px;" placeholder="────────────────────────────────────────────────────────────────"></div></td>
+  </tr>
+  <tr>
+    <td colspan="5"></td>
+    <td colspan="4"></td>
+  </tr>
+
+  <tr>
+    <td rowspan="5" class="section-label" style="background:#f2f2f2;">მოტეხილობა FRACTURES</td>
+    <td colspan="9">
+      ლოკალიზაცია: <input type="text" style="width:80%;">
+    </td>
+  </tr>
+  <tr>
+    <td colspan="5">
+      <div class="cr">
+        <label><input type="checkbox"> ღია მოტეხილობა</label>
+        <label><input type="checkbox"> პულსი არ ისინჯება</label>
+        <label><input type="checkbox"> დეფორმაცია</label>
+        <label><input type="checkbox"> მგრძნობელობა ↓</label>
+        <label><input type="checkbox"> იმობილიზებულია</label>
+      </div>
+    </td>
+    <td colspan="4"><div class="cr"><label><input type="checkbox"> ჭრილობის დამუშავება/მოვლა</label></div></td>
+  </tr>
+  <tr>
+    <td colspan="5"></td>
+    <td colspan="4"><div class="cr"><label><input type="checkbox"> ურგენტული მანიპულაციისთვის მომზადება</label></div></td>
+  </tr>
+  <tr>
+    <td colspan="5"></td>
+    <td colspan="4"><div class="cr">სხვა<input class="ii" type="text" style="width:160px;" placeholder="────────────────────────────────────────────────────────────────"></div></td>
+  </tr>
+  <tr>
+    <td colspan="5"></td>
+    <td colspan="4"></td>
+  </tr>
+
+  <tr>
+    <td rowspan="5" class="section-label" style="background:#f2f2f2;">ჭრილობა დამწვრობა WOUNDS</td>
+    <td colspan="9">
+      ლოკალიზაცია: <input type="text" style="width:80%;">
+    </td>
+  </tr>
+  <tr>
+    <td colspan="5">
+      <div class="cr">
+        <label><input type="checkbox"> არასისხლდმენი</label>
+        <label><input type="checkbox"> დაბინძურება</label>
+        <label><input type="checkbox"> მცირე სისხლდენა</label>
+        <label><input type="checkbox"> ინფიცირება</label>
+        <label><input type="checkbox"> მასიური სისხლდენა</label>
+        <label><input type="checkbox"> უცხო სხეული ჭრილობაში</label>
+      </div>
+    </td>
+    <td colspan="4"><div class="cr"><label><input type="checkbox"> დამწვრობის/ჭრილობის დამუშავება/მოვლა</label></div></td>
+  </tr>
+  <tr>
+    <td colspan="5"></td>
+    <td colspan="4"><div class="cr"><label><input type="checkbox"> ურგენტული მანიპულაციისთვის მომზადება</label></div></td>
+  </tr>
+  <tr>
+    <td colspan="5"></td>
+    <td colspan="4"><div class="cr">სხვა<input class="ii" type="text" style="width:160px;" placeholder="────────────────────────────────────────────────────────────────"></div></td>
+  </tr>
+  <tr>
+    <td colspan="5"></td>
+    <td colspan="4"></td>
+  </tr>
+
+  <tr>
+    <td rowspan="5" class="section-label" style="background:#f2f2f2;">კომფორტი COMFORT</td>
+    <td colspan="3">
+      ტკივილი 1-10 ქ &nbsp;<input class="ii" type="text" style="width:50px;" placeholder="________">
+    </td>
+    <td colspan="6">
+      ლოკალიზაცია: <input class="ii" type="text" style="width:55%;" placeholder="________________">
+    </td>
+  </tr>
+  <tr>
+    <td colspan="5">
+      <div class="cr">
+        <label><input type="checkbox"> გარდამავალი</label>
+        <label><input type="checkbox"> უეცარი და ძლიერი</label>
+        <label><input type="checkbox"> მუდმივი</label>
+        <label><input type="checkbox"> ყრუ</label>
+        <label><input type="checkbox"> მწველი</label>
+        <label><input type="checkbox"> სხვა <input class="ii" type="text" style="width:80px;" placeholder="__________________________"></label>
+      </div>
+    </td>
+    <td colspan="4"><div class="cr"><label><input type="checkbox"> ანალგეზია</label></div></td>
+  </tr>
+  <tr>
+    <td colspan="5"></td>
+    <td colspan="4"><div class="cr"><label><input type="checkbox"> კვლევისთვის/მანიპულაციისთვის მომზადება</label></div></td>
+  </tr>
+  <tr>
+    <td colspan="5"></td>
+    <td colspan="4"><div class="cr">სხვა<input class="ii" type="text" style="width:160px;" placeholder="────────────────────────────────────────────────────────────────"></div></td>
+  </tr>
+  <tr>
+    <td colspan="5"></td>
+    <td colspan="4"></td>
+  </tr>
+
+</table>
+
+<button class="print-btn" onclick="window.print()">დაბეჭდვა</button>
+
+</div>
+<script>
+  document.getElementById('entry-date').valueAsDate = new Date();
+</script>
+</body>
+</html>

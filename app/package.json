@@ -6,9 +6,9 @@
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
     "sync:data": "node ./scripts/sync-external-data.mjs",
-    "build": "rm -rf ../.pages-dist ../assets ../index.html ../404.html ../favicon.png ../.nojekyll && vite build && cp -R ../.pages-dist/assets ../assets && cp ../.pages-dist/index.html ../index.html && cp ../.pages-dist/index.html ../404.html && cp ../.pages-dist/favicon.png ../favicon.png && touch ../.nojekyll",
+    "build": "rm -rf ../.pages-dist ../assets ../nursing ../index.html ../404.html ../favicon.png ../.nojekyll && vite build && cp -R ../.pages-dist/assets ../assets && if [ -d ../.pages-dist/nursing ]; then cp -R ../.pages-dist/nursing ../nursing; fi && cp ../.pages-dist/index.html ../index.html && cp ../.pages-dist/index.html ../404.html && cp ../.pages-dist/favicon.png ../favicon.png && touch ../.nojekyll",
     "preview": "vite preview",
-    "clean": "rm -rf ../.pages-dist ../assets ../index.html ../404.html ../favicon.png ../.nojekyll",
+    "clean": "rm -rf ../.pages-dist ../assets ../nursing ../index.html ../404.html ../favicon.png ../.nojekyll",
     "lint": "tsc --noEmit"
   },
   "dependencies": {
