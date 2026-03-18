@@ -129,8 +129,16 @@ export const RESOURCES: ResourceLink[] = [
     id: '13',
     title: 'საექთნო დოკუმენტები',
     description: 'საექთნო დოკუმენტების პლატფორმა',
-    url: './nursing/primary-abcdfwc-assessment.html',
+    url: 'https://imed458.github.io/nurse.github.io/',
     icon: 'BriefcaseMedical',
+    access: 'ვებ',
+  },
+  {
+    id: '14',
+    title: 'პაციენტის პირველადი საექთნო ABCDFWC შეფასება გადაუდებელი დახმარების დეპარტამენტში',
+    description: 'საექთნო შეფასების დასაბეჭდი ფორმა',
+    url: './nursing/primary-abcdfwc-assessment.html',
+    icon: 'FileText',
     access: 'ვებ',
   }
 ];
