@@ -132,5 +132,13 @@ export const RESOURCES: ResourceLink[] = [
     url: 'https://imed458.github.io/nurse.github.io/',
     icon: 'BriefcaseMedical',
     access: 'ვებ',
+  },
+  {
+    id: '14',
+    title: 'მიმართვა სისხლის კომპონენტებზე',
+    description: 'სისხლის კომპონენტების მოთხოვნის დასაბეჭდი ფორმა',
+    url: 'nursing/blood-components-request.html',
+    icon: 'Droplets',
+    access: 'ვებ',
   }
 ];

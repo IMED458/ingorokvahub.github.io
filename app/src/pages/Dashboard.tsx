@@ -21,7 +21,8 @@ import {
   ClipboardList,
   Database,
   Beaker,
-  Files
+  Files,
+  Droplets
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { RESOURCES } from '../constants';
@@ -63,7 +64,8 @@ const iconMap: Record<string, any> = {
   Activity,
   BookOpen,
   Files,
-  BriefcaseMedical
+  BriefcaseMedical,
+  Droplets
 };
 
 interface DashboardProps {

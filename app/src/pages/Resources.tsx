@@ -14,6 +14,7 @@ import {
   BookOpen, 
   Files,
   BriefcaseMedical,
+  Droplets,
   Search
 } from 'lucide-react';
 import { RESOURCES } from '../constants';
@@ -31,7 +32,8 @@ const iconMap: Record<string, any> = {
   Activity,
   BookOpen,
   Files,
-  BriefcaseMedical
+  BriefcaseMedical,
+  Droplets
 };
 
 export function Resources() {
