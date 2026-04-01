@@ -102,6 +102,14 @@ export const RESOURCES: ResourceLink[] = [
     access: 'ვებ',
   },
   {
+    id: '15',
+    title: 'CareDesk',
+    description: 'ელექტრონული დანიშნულებისა და სამუშაო პროცესის პლატფორმა',
+    url: 'https://imed458.github.io/epriscription.github.io/dist/#/',
+    icon: 'BriefcaseMedical',
+    access: 'ვებ',
+  },
+  {
     id: '6',
     title: 'ER ორდერ-სეტი',
     description: 'გადაუდებელი დახმარების შეკვეთების ნაკრები',
